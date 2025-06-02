@@ -4,10 +4,11 @@
 // When the 'save.jkr' file is created or modified, it will create a new copy in the 'Saves' directory (UserConfig.SaveBasePath + "BalatroSaveToolkit\Saves\" + UserConfig.UserProfile)
 // titled based on YY-MM-DD-hh-mm-ss-{Ante}-{Blind}-{Hand}.jkr (the Ante, Blind, and Hand will be determined by logic not yet implemented)
 public class SaveService {
-    private readonly UserConfig _userConfig;
-    private readonly string _saveDirectory;
-    private readonly string _saveFileName = "save.jkr";
-    private readonly string _savesDirectory;
+    public UserConfig _userConfig;
+    public string _saveDirectory;
+    public string _saveFileName = "save.jkr";
+    private string _savesDirectory;
+    
 
     public SaveService(UserConfig userConfig) {
         _userConfig = userConfig ?? throw new ArgumentNullException(nameof(userConfig));
