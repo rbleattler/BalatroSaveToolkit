@@ -23,7 +23,8 @@ public partial class MainWindow : Window
     private readonly Logger _logger;
     private readonly ObservableCollection<TreeNodeViewModel> _treeNodes;
     private string? _currentFilePath;
-    private string? _currentDecompressedContent;public MainWindow()
+    private string? _currentDecompressedContent;
+    public MainWindow()
     {
         InitializeComponent();
 
@@ -49,7 +50,8 @@ public partial class MainWindow : Window
         {
             LoadFile(openFileDialog.FileName);
         }
-    }    private void LoadFile(string filePath)
+    }
+    private void LoadFile(string filePath)
     {
         try
         {
@@ -142,7 +144,8 @@ public partial class MainWindow : Window
     {
         LogPanelRow.Height = new GridLength(0);
         _logger.Log("Log panel hidden");
-    }    private void ClearLogsButton_Click(object sender, RoutedEventArgs e)
+    }
+    private void ClearLogsButton_Click(object sender, RoutedEventArgs e)
     {
         _logger.ClearLogs();
         LogTextBox.Text = "";
