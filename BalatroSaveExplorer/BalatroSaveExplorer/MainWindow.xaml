@@ -7,10 +7,11 @@
         mc:Ignorable="d"
         Title="Balatro JKR File Viewer" Height="600" Width="1000">
     <DockPanel>
-        <!-- Top toolbar -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" Height="40">
+        <!-- Top toolbar -->        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" Height="40">
             <Button x:Name="LoadFileButton" Content="Load JKR File" Width="120" Height="30"
                     Click="LoadFileButton_Click" Margin="0,0,10,0"/>
+            <Button x:Name="SaveAsLuaButton" Content="Save as Lua" Width="120" Height="30"
+                    Click="SaveAsLuaButton_Click" Margin="0,0,10,0" IsEnabled="False"/>
             <CheckBox x:Name="ShowLogsCheckBox" Content="Show Logs"
                      VerticalAlignment="Center" Checked="ShowLogsCheckBox_Checked"
                      Unchecked="ShowLogsCheckBox_Unchecked"/>

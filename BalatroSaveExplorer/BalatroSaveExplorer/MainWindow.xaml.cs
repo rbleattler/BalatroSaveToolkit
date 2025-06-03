@@ -21,7 +21,9 @@ namespace BalatroSaveExplorer;
 public partial class MainWindow : Window
 {
     private readonly Logger _logger;
-    private readonly ObservableCollection<TreeNodeViewModel> _treeNodes; public MainWindow()
+    private readonly ObservableCollection<TreeNodeViewModel> _treeNodes;
+    private string? _currentFilePath;
+    private string? _currentDecompressedContent;public MainWindow()
     {
         InitializeComponent();
 
@@ -47,8 +49,7 @@ public partial class MainWindow : Window
         {
             LoadFile(openFileDialog.FileName);
         }
-    }
-    private void LoadFile(string filePath)
+    }    private void LoadFile(string filePath)
     {
         try
         {
@@ -58,6 +59,10 @@ public partial class MainWindow : Window
             // Read and decompress the file content
             string content = ReadAndDecompressJkrFile(filePath);
             _logger.Log($"Decompressed file size: {content.Length} characters");
+
+            // Store the current file info
+            _currentFilePath = filePath;
+            _currentDecompressedContent = content;
 
             // Parse the Lua table
             var parsedData = LuaTableConverter.ParseLuaTable(content);
@@ -69,6 +74,9 @@ public partial class MainWindow : Window
 
             StatusLabel.Content = $"Loaded: {System.IO.Path.GetFileName(filePath)}";
             _logger.Log("File loaded successfully");
+
+            // Update Save as Lua button state
+            UpdateSaveAsLuaButtonState();
         }
         catch (Exception ex)
         {
@@ -76,6 +84,11 @@ public partial class MainWindow : Window
             StatusLabel.Content = "Error loading file";
             _logger.Log(errorMsg);
             MessageBox.Show(errorMsg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            // Clear current file info on error
+            _currentFilePath = null;
+            _currentDecompressedContent = null;
+            UpdateSaveAsLuaButtonState();
         }
     }
 
@@ -129,12 +142,71 @@ public partial class MainWindow : Window
     {
         LogPanelRow.Height = new GridLength(0);
         _logger.Log("Log panel hidden");
-    }
-
-    private void ClearLogsButton_Click(object sender, RoutedEventArgs e)
+    }    private void ClearLogsButton_Click(object sender, RoutedEventArgs e)
     {
         _logger.ClearLogs();
         LogTextBox.Text = "";
+    }
+
+    private void SaveAsLuaButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(_currentFilePath) || string.IsNullOrEmpty(_currentDecompressedContent))
+        {
+            MessageBox.Show("No file is currently loaded.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        try
+        {            // Generate the output path by replacing .jkr with .lua
+            string outputPath = System.IO.Path.ChangeExtension(_currentFilePath, ".lua");
+            _logger.Log($"Saving decompressed content to: {outputPath}");            // Prepend "return = " to the content
+            string luaContent = "return = " + _currentDecompressedContent;
+
+            // Write the content to the .lua file
+            File.WriteAllText(outputPath, luaContent, Encoding.UTF8);
+
+            _logger.Log($"Successfully saved {luaContent.Length} characters to {outputPath}");
+            StatusLabel.Content = $"Saved: {System.IO.Path.GetFileName(outputPath)}";
+
+            // Update button state since the file now exists
+            UpdateSaveAsLuaButtonState();
+
+            MessageBox.Show($"File saved successfully as:\n{outputPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            string errorMsg = $"Error saving file: {ex.Message}";
+            _logger.Log(errorMsg);
+            MessageBox.Show(errorMsg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void UpdateSaveAsLuaButtonState()
+    {
+        if (string.IsNullOrEmpty(_currentFilePath))
+        {
+            // No file loaded - disable button
+            SaveAsLuaButton.IsEnabled = false;
+            SaveAsLuaButton.Content = "Save as Lua";
+            return;
+        }
+
+        string luaPath = System.IO.Path.ChangeExtension(_currentFilePath, ".lua");
+        bool luaFileExists = File.Exists(luaPath);
+
+        if (luaFileExists)
+        {
+            // File exists - gray out button and change text
+            SaveAsLuaButton.IsEnabled = false;
+            SaveAsLuaButton.Content = "Lua file exists";
+            _logger.Log($"Lua file already exists: {luaPath}");
+        }
+        else
+        {
+            // File doesn't exist - enable button
+            SaveAsLuaButton.IsEnabled = true;
+            SaveAsLuaButton.Content = "Save as Lua";
+        }
     }
 
     private void OnLogAdded(object? sender, string logMessage)
