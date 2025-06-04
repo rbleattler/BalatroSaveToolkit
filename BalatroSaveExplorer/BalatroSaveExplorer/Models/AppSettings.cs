@@ -1,8 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.IO;
-using System.IO.Compression;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BalatroSaveExplorer.Models;
@@ -12,14 +10,15 @@ namespace BalatroSaveExplorer.Models;
 /// </summary>
 public class AppSettings : INotifyPropertyChanged
 {
-    private string _defaultJkrDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-    private string _defaultLuaExportDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+    private static string _appDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BalatroSaveExplorer");
+    private string _defaultJkrDirectory = Path.Combine(_appDataDirectory, "Saves");
+    private string _defaultLuaExportDirectory = Path.Combine(_appDataDirectory, "LuaExports");
     private bool _showLogsOnStartup = false;
     private bool _autoSaveDecompressedFiles = false;
     private bool _confirmFileOverwrites = true;
-    private string _logLevel = "Info";    private int _maxLogEntries = 1000;
+    private string _logLevel = "Info"; private int _maxLogEntries = 1000;
     private bool _enableAutoBackup = true;
-    private string _backupDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BalatroBackups");
+    private string _backupDirectory = Path.Combine(_appDataDirectory, "BalatroBackups");
     private string _balatroSaveRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Balatro");
 
     // File watching settings
@@ -98,8 +97,8 @@ public class AppSettings : INotifyPropertyChanged
         get => _enableAutoBackup;
         set => SetProperty(ref _enableAutoBackup, value);
     }    /// <summary>
-    /// Directory for storing automatic backups
-    /// </summary>
+         /// Directory for storing automatic backups
+         /// </summary>
     public string BackupDirectory
     {
         get => _backupDirectory;
@@ -119,8 +118,8 @@ public class AppSettings : INotifyPropertyChanged
     /// Path to Balatro's main settings file (derived)
     /// </summary>
     public string BalatroSettingsFilePath => Path.Combine(BalatroSaveRoot, "settings.jkr");    /// <summary>
-    /// Current profile number (derived from settings.jkr)
-    /// </summary>
+                                                                                               /// Current profile number (derived from settings.jkr)
+                                                                                               /// </summary>
     public int CurrentProfileNumber
     {
         get
@@ -133,7 +132,7 @@ public class AppSettings : INotifyPropertyChanged
                     var settingsContent = ReadAndDecompressJkrFile(BalatroSettingsFilePath);
 
                     // Simple regex-based parsing to find profile value
-                    var match = System.Text.RegularExpressions.Regex.Match(settingsContent, @"profile\s*=\s*(\d+)");
+                    var match = Regex.Match(settingsContent, @"profile\s*=\s*(\d+)");
                     if (match.Success && int.TryParse(match.Groups[1].Value, out int profileNum))
                     {
                         return profileNum;
@@ -157,8 +156,8 @@ public class AppSettings : INotifyPropertyChanged
     /// Path to current profile's meta file (derived)
     /// </summary>
     public string CurrentProfileMetaPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "meta.jkr");    /// <summary>
-    /// Path to current profile's save file (derived)
-    /// </summary>
+                                                                                                                           /// Path to current profile's save file (derived)
+                                                                                                                           /// </summary>
     public string CurrentProfileSavePath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "save.jkr");
 
     /// <summary>
@@ -193,7 +192,8 @@ public class AppSettings : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }    protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    }
+    protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
         field = value;
