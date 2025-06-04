@@ -79,7 +79,9 @@ public partial class MainWindow : Window
             ApplySettings();
             _logger.Log("Settings updated and applied");
         }
-    }    private void LoadFile(string filePath)
+    }
+
+    public void LoadFile(string filePath)
     {
         try
         {

@@ -84,36 +84,70 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBox x:Name="BalatroSaveRootTextBox" Grid.Column="0"
-                                             VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    </Grid.ColumnDefinitions>                                    <TextBox x:Name="BalatroSaveRootTextBox" Grid.Column="0"
+                                             VerticalAlignment="Center" Margin="0,0,5,0"
+                                             TextChanged="BalatroSaveRootTextBox_TextChanged"/>
                                     <Button x:Name="BrowseBalatroSaveRootButton" Grid.Column="1"
                                             Content="Browse..." Width="80" Height="25"
                                             Click="BrowseBalatroSaveRootButton_Click"/>
-                                </Grid>
-
-                                <Separator Margin="0,5,0,10"/>
+                                </Grid>                                <Separator Margin="0,5,0,10"/>
                                 <Label Content="Derived Paths (Read-only):" FontWeight="Bold"/>
 
                                 <Label Content="Settings File:" Margin="0,5,0,0"/>
-                                <TextBox x:Name="BalatroSettingsFilePathTextBox" IsReadOnly="True"
-                                         Background="LightGray" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="BalatroSettingsFilePathTextBox" Grid.Column="0" IsReadOnly="True"
+                                             Background="LightGray" Margin="0,0,5,0"/>
+                                    <Button x:Name="LoadBalatroSettingsButton" Grid.Column="1"
+                                            Content="Load" Width="50" Height="25"
+                                            Click="LoadBalatroSettingsButton_Click"/>
+                                </Grid>
 
                                 <Label Content="Current Profile:" Margin="0,5,0,0"/>
                                 <TextBox x:Name="CurrentProfileNumberTextBox" IsReadOnly="True"
                                          Background="LightGray" Margin="0,0,0,5"/>
 
                                 <Label Content="Profile Settings:" Margin="0,5,0,0"/>
-                                <TextBox x:Name="CurrentProfileSettingsPathTextBox" IsReadOnly="True"
-                                         Background="LightGray" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="CurrentProfileSettingsPathTextBox" Grid.Column="0" IsReadOnly="True"
+                                             Background="LightGray" Margin="0,0,5,0"/>
+                                    <Button x:Name="LoadProfileSettingsButton" Grid.Column="1"
+                                            Content="Load" Width="50" Height="25"
+                                            Click="LoadProfileSettingsButton_Click"/>
+                                </Grid>
 
                                 <Label Content="Profile Meta:" Margin="0,5,0,0"/>
-                                <TextBox x:Name="CurrentProfileMetaPathTextBox" IsReadOnly="True"
-                                         Background="LightGray" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="CurrentProfileMetaPathTextBox" Grid.Column="0" IsReadOnly="True"
+                                             Background="LightGray" Margin="0,0,5,0"/>
+                                    <Button x:Name="LoadProfileMetaButton" Grid.Column="1"
+                                            Content="Load" Width="50" Height="25"
+                                            Click="LoadProfileMetaButton_Click"/>
+                                </Grid>
 
                                 <Label Content="Profile Save:" Margin="0,5,0,0"/>
-                                <TextBox x:Name="CurrentProfileSavePathTextBox" IsReadOnly="True"
-                                         Background="LightGray" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="CurrentProfileSavePathTextBox" Grid.Column="0" IsReadOnly="True"
+                                             Background="LightGray" Margin="0,0,5,0"/>
+                                    <Button x:Name="LoadProfileSaveButton" Grid.Column="1"
+                                            Content="Load" Width="50" Height="25"
+                                            Click="LoadProfileSaveButton_Click"/>
+                                </Grid>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>

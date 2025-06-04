@@ -29,8 +29,8 @@ public partial class SettingsWindow : Window
         // Set the settings file path for display
         SettingsFilePathTextBox.Text = SettingsManager.Instance.GetSettingsFilePath();
     }    /// <summary>
-    /// Creates a deep copy of the settings object
-    /// </summary>
+         /// Creates a deep copy of the settings object
+         /// </summary>
     private AppSettings CloneSettings(AppSettings original)
     {
         return new AppSettings
@@ -47,8 +47,8 @@ public partial class SettingsWindow : Window
             BalatroSaveRoot = original.BalatroSaveRoot
         };
     }    /// <summary>
-    /// Loads the working settings into the UI controls
-    /// </summary>
+         /// Loads the working settings into the UI controls
+         /// </summary>
     private void LoadSettingsIntoControls()
     {
         DefaultJkrDirectoryTextBox.Text = _workingSettings.DefaultJkrDirectory;
@@ -74,8 +74,8 @@ public partial class SettingsWindow : Window
         // Update derived path displays
         UpdateBalatroDerivedPaths();
     }    /// <summary>
-    /// Saves the UI control values back to the working settings
-    /// </summary>
+         /// Saves the UI control values back to the working settings
+         /// </summary>
     private void SaveControlsToSettings()
     {
         _workingSettings.DefaultJkrDirectory = DefaultJkrDirectoryTextBox.Text;
@@ -97,8 +97,8 @@ public partial class SettingsWindow : Window
             _workingSettings.LogLevel = selectedItem.Content.ToString() ?? "Info";
         }
     }    /// <summary>
-    /// Applies the working settings to the global settings manager
-    /// </summary>
+         /// Applies the working settings to the global settings manager
+         /// </summary>
     private void ApplySettings()
     {
         var settings = SettingsManager.Instance.Settings;
@@ -197,7 +197,7 @@ public partial class SettingsWindow : Window
             _workingSettings.DefaultLuaExportDirectory = defaultSettings.DefaultLuaExportDirectory;
             _workingSettings.ShowLogsOnStartup = defaultSettings.ShowLogsOnStartup;
             _workingSettings.AutoSaveDecompressedFiles = defaultSettings.AutoSaveDecompressedFiles;
-            _workingSettings.ConfirmFileOverwrites = defaultSettings.ConfirmFileOverwrites;            _workingSettings.LogLevel = defaultSettings.LogLevel;
+            _workingSettings.ConfirmFileOverwrites = defaultSettings.ConfirmFileOverwrites; _workingSettings.LogLevel = defaultSettings.LogLevel;
             _workingSettings.MaxLogEntries = defaultSettings.MaxLogEntries;
             _workingSettings.EnableAutoBackup = defaultSettings.EnableAutoBackup;
             _workingSettings.BackupDirectory = defaultSettings.BackupDirectory;
@@ -266,6 +266,71 @@ public partial class SettingsWindow : Window
         catch (Exception ex)
         {
             MessageBox.Show($"Error opening settings folder: {ex.Message}", "Error",
+                          MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_workingSettings != null && sender is TextBox textBox)
+        {
+            _workingSettings.BalatroSaveRoot = textBox.Text;
+            UpdateBalatroDerivedPaths();
+        }
+    }
+
+    private void LoadBalatroSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        LoadJkrFile(_workingSettings.BalatroSettingsFilePath, "Balatro Settings");
+    }
+
+    private void LoadProfileSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        LoadJkrFile(_workingSettings.CurrentProfileSettingsPath, "Profile Settings");
+    }
+
+    private void LoadProfileMetaButton_Click(object sender, RoutedEventArgs e)
+    {
+        LoadJkrFile(_workingSettings.CurrentProfileMetaPath, "Profile Meta");
+    }
+
+    private void LoadProfileSaveButton_Click(object sender, RoutedEventArgs e)
+    {
+        LoadJkrFile(_workingSettings.CurrentProfileSavePath, "Profile Save");
+    }    /// <summary>
+         /// Helper method to load a JKR file in the main application
+         /// </summary>
+    private void LoadJkrFile(string filePath, string fileType)
+    {
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                MessageBox.Show($"{fileType} file not found:\n{filePath}", "File Not Found",
+                              MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Close the settings window and trigger loading in the main window
+            DialogResult = true;
+
+            // Find the main window and call its public LoadFile method
+            var mainWindow = Application.Current.MainWindow as MainWindow;
+            if (mainWindow != null)
+            {
+                mainWindow.LoadFile(filePath);
+            }
+            else
+            {
+                MessageBox.Show($"Unable to access main window. Please use the Load JKR File button instead.",
+                              "Load Error", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
+            Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading {fileType}: {ex.Message}", "Error",
                           MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
