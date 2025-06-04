@@ -13,8 +13,10 @@ using System.IO.Compression;
 using System.Collections.ObjectModel;
 using BalatroSaveExplorer.Services;
 using BalatroSaveExplorer.Windows;
+using BalatroSaveExplorer.Models;
 using System.Windows.Shell;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace BalatroSaveExplorer;
 
@@ -22,7 +24,8 @@ namespace BalatroSaveExplorer;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : Window
-{    private readonly Logger _logger;
+{
+    private readonly Logger _logger;
     private readonly ObservableCollection<TreeNodeViewModel> _treeNodes;
     private string? _currentFilePath;
     private string? _currentDecompressedContent;
@@ -30,7 +33,10 @@ public partial class MainWindow : Window
     private DateTime _lastFileUpdate;
     private bool _isWatchingDerivedFile;
     private DispatcherTimer _flashTimer;
-    private int _flashCount;    public MainWindow()
+    private int _flashCount;
+
+    // Settings management fields
+    private AppSettings _workingSettings;    public MainWindow()
     {
         InitializeComponent();
 
@@ -45,6 +51,13 @@ public partial class MainWindow : Window
 
         // Subscribe to logger events
         _logger.LogAdded += OnLogAdded;
+
+        // Initialize settings
+        _workingSettings = CloneSettings(SettingsManager.Instance.Settings);
+        LoadSettingsIntoControls();
+
+        // Set the settings file path for display
+        SettingsFilePathTextBox.Text = SettingsManager.Instance.GetSettingsFilePath();
 
         // Apply settings on startup
         ApplySettings();
@@ -74,23 +87,336 @@ public partial class MainWindow : Window
         };        if (openFileDialog.ShowDialog() == true)
         {
             LoadFile(openFileDialog.FileName);
+        }    }
+
+    #region Settings Management
+
+    /// <summary>
+    /// Creates a deep copy of the settings object
+    /// </summary>
+    private AppSettings CloneSettings(AppSettings original)
+    {
+        return new AppSettings
+        {
+            DefaultJkrDirectory = original.DefaultJkrDirectory,
+            DefaultLuaExportDirectory = original.DefaultLuaExportDirectory,
+            ShowLogsOnStartup = original.ShowLogsOnStartup,
+            AutoSaveDecompressedFiles = original.AutoSaveDecompressedFiles,
+            ConfirmFileOverwrites = original.ConfirmFileOverwrites,
+            LogLevel = original.LogLevel,
+            MaxLogEntries = original.MaxLogEntries,
+            EnableAutoBackup = original.EnableAutoBackup,
+            BackupDirectory = original.BackupDirectory,
+            BalatroSaveRoot = original.BalatroSaveRoot,
+            EnableFileWatching = original.EnableFileWatching,
+            FlashTaskbarOnUpdate = original.FlashTaskbarOnUpdate,
+            AutoRefreshOnFileChange = original.AutoRefreshOnFileChange
+        };
+    }
+
+    /// <summary>
+    /// Loads the working settings into the UI controls
+    /// </summary>
+    private void LoadSettingsIntoControls()
+    {
+        DefaultJkrDirectoryTextBox.Text = _workingSettings.DefaultJkrDirectory;
+        DefaultLuaExportDirectoryTextBox.Text = _workingSettings.DefaultLuaExportDirectory;
+        ShowLogsOnStartupCheckBox.IsChecked = _workingSettings.ShowLogsOnStartup;
+        AutoSaveDecompressedFilesCheckBox.IsChecked = _workingSettings.AutoSaveDecompressedFiles;
+        ConfirmFileOverwritesCheckBox.IsChecked = _workingSettings.ConfirmFileOverwrites;
+        EnableAutoBackupCheckBox.IsChecked = _workingSettings.EnableAutoBackup;
+        BackupDirectoryTextBox.Text = _workingSettings.BackupDirectory;
+        BalatroSaveRootTextBox.Text = _workingSettings.BalatroSaveRoot;
+        MaxLogEntriesTextBox.Text = _workingSettings.MaxLogEntries.ToString();
+
+        // File watching settings
+        EnableFileWatchingCheckBox.IsChecked = _workingSettings.EnableFileWatching;
+        FlashTaskbarOnUpdateCheckBox.IsChecked = _workingSettings.FlashTaskbarOnUpdate;
+        AutoRefreshOnFileChangeCheckBox.IsChecked = _workingSettings.AutoRefreshOnFileChange;
+
+        // Set the log level combobox
+        foreach (ComboBoxItem item in LogLevelComboBox.Items)
+        {
+            if (item.Content.ToString() == _workingSettings.LogLevel)
+            {
+                LogLevelComboBox.SelectedItem = item;
+                break;
+            }
+        }
+
+        // Update derived path displays
+        UpdateBalatroDerivedPaths();
+    }
+
+    /// <summary>
+    /// Saves the UI control values back to the working settings
+    /// </summary>
+    private void SaveControlsToSettings()
+    {
+        _workingSettings.DefaultJkrDirectory = DefaultJkrDirectoryTextBox.Text;
+        _workingSettings.DefaultLuaExportDirectory = DefaultLuaExportDirectoryTextBox.Text;
+        _workingSettings.ShowLogsOnStartup = ShowLogsOnStartupCheckBox.IsChecked ?? false;
+        _workingSettings.AutoSaveDecompressedFiles = AutoSaveDecompressedFilesCheckBox.IsChecked ?? false;
+        _workingSettings.ConfirmFileOverwrites = ConfirmFileOverwritesCheckBox.IsChecked ?? true;
+        _workingSettings.EnableAutoBackup = EnableAutoBackupCheckBox.IsChecked ?? true;
+        _workingSettings.BackupDirectory = BackupDirectoryTextBox.Text;
+        _workingSettings.BalatroSaveRoot = BalatroSaveRootTextBox.Text;
+
+        // File watching settings
+        _workingSettings.EnableFileWatching = EnableFileWatchingCheckBox.IsChecked ?? true;
+        _workingSettings.FlashTaskbarOnUpdate = FlashTaskbarOnUpdateCheckBox.IsChecked ?? true;
+        _workingSettings.AutoRefreshOnFileChange = AutoRefreshOnFileChangeCheckBox.IsChecked ?? true;
+
+        if (int.TryParse(MaxLogEntriesTextBox.Text, out int maxLogEntries))
+        {
+            _workingSettings.MaxLogEntries = maxLogEntries;
+        }
+
+        if (LogLevelComboBox.SelectedItem is ComboBoxItem selectedItem)
+        {
+            _workingSettings.LogLevel = selectedItem.Content.ToString() ?? "Info";
         }
     }
 
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// Applies the working settings to the global settings manager
+    /// </summary>
+    private void ApplySettingsChanges()
     {
-        var settingsWindow = new SettingsWindow()
+        var settings = SettingsManager.Instance.Settings;
+
+        settings.DefaultJkrDirectory = _workingSettings.DefaultJkrDirectory;
+        settings.DefaultLuaExportDirectory = _workingSettings.DefaultLuaExportDirectory;
+        settings.ShowLogsOnStartup = _workingSettings.ShowLogsOnStartup;
+        settings.AutoSaveDecompressedFiles = _workingSettings.AutoSaveDecompressedFiles;
+        settings.ConfirmFileOverwrites = _workingSettings.ConfirmFileOverwrites;
+        settings.LogLevel = _workingSettings.LogLevel;
+        settings.MaxLogEntries = _workingSettings.MaxLogEntries;
+        settings.EnableAutoBackup = _workingSettings.EnableAutoBackup;
+        settings.BackupDirectory = _workingSettings.BackupDirectory;
+        settings.BalatroSaveRoot = _workingSettings.BalatroSaveRoot;
+
+        // File watching settings
+        settings.EnableFileWatching = _workingSettings.EnableFileWatching;
+        settings.FlashTaskbarOnUpdate = _workingSettings.FlashTaskbarOnUpdate;
+        settings.AutoRefreshOnFileChange = _workingSettings.AutoRefreshOnFileChange;
+
+        SettingsManager.Instance.SaveSettings();
+    }
+
+    private void BrowseJkrDirectoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog
         {
-            Owner = this
+            Title = "Select Default JKR Directory",
+            InitialDirectory = DefaultJkrDirectoryTextBox.Text
         };
 
-        if (settingsWindow.ShowDialog() == true)
+        if (dialog.ShowDialog() == true)
         {
-            // Settings were saved, apply them
-            ApplySettings();
-            _logger.Log("Settings updated and applied");
+            DefaultJkrDirectoryTextBox.Text = dialog.FolderName;
         }
     }
+
+    private void BrowseLuaExportDirectoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = "Select Default Lua Export Directory",
+            InitialDirectory = DefaultLuaExportDirectoryTextBox.Text
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            DefaultLuaExportDirectoryTextBox.Text = dialog.FolderName;
+        }
+    }
+
+    private void BrowseBackupDirectoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = "Select Backup Directory",
+            InitialDirectory = BackupDirectoryTextBox.Text
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            BackupDirectoryTextBox.Text = dialog.FolderName;
+        }
+    }
+
+    private void BrowseBalatroSaveRootButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = "Select Balatro Save Root Directory",
+            InitialDirectory = BalatroSaveRootTextBox.Text
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            BalatroSaveRootTextBox.Text = dialog.FolderName;
+            UpdateBalatroDerivedPaths();
+        }
+    }
+
+    private void ApplySettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            SaveControlsToSettings();
+            ApplySettingsChanges();
+            _workingSettings = CloneSettings(SettingsManager.Instance.Settings);
+            _logger.Log("Settings applied successfully");
+            MessageBox.Show("Settings have been applied successfully.", "Settings",
+                          MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Error applying settings: {ex.Message}");
+            MessageBox.Show($"Error applying settings: {ex.Message}", "Error",
+                          MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void ResetToDefaultsButton_Click(object sender, RoutedEventArgs e)
+    {
+        var result = MessageBox.Show(
+            "Are you sure you want to reset all settings to their default values?",
+            "Reset Settings",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            _workingSettings = new AppSettings(); // This creates a new instance with defaults
+            LoadSettingsIntoControls();
+            _logger.Log("Settings reset to defaults");
+        }
+    }
+
+    private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        UpdateBalatroDerivedPaths();
+    }
+
+    private void UpdateBalatroDerivedPaths()
+    {
+        var saveRoot = BalatroSaveRootTextBox.Text;
+
+        if (string.IsNullOrWhiteSpace(saveRoot))
+        {
+            BalatroSettingsFilePathTextBox.Text = "";
+            CurrentProfileNumberTextBox.Text = "";
+            CurrentProfileSettingsPathTextBox.Text = "";
+            CurrentProfileMetaPathTextBox.Text = "";
+            CurrentProfileSavePathTextBox.Text = "";
+            return;
+        }
+
+        try
+        {
+            var settingsPath = Path.Combine(saveRoot, "settings.jkr");
+            BalatroSettingsFilePathTextBox.Text = settingsPath;
+
+            // Try to determine current profile (this is a placeholder - would need actual logic)
+            CurrentProfileNumberTextBox.Text = "1"; // Default profile
+
+            var profilePath = Path.Combine(saveRoot, "1");
+            CurrentProfileSettingsPathTextBox.Text = Path.Combine(profilePath, "profile.jkr");
+            CurrentProfileMetaPathTextBox.Text = Path.Combine(profilePath, "meta.jkr");
+            CurrentProfileSavePathTextBox.Text = Path.Combine(profilePath, "save.jkr");
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Error updating derived paths: {ex.Message}");
+        }
+    }
+
+    private void LoadBalatroSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        var filePath = BalatroSettingsFilePathTextBox.Text;
+        if (File.Exists(filePath))
+        {
+            LoadFile(filePath);
+            MainTabControl.SelectedItem = TreeViewTab;
+        }
+        else
+        {
+            MessageBox.Show("Settings file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void LoadProfileSettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        var filePath = CurrentProfileSettingsPathTextBox.Text;
+        if (File.Exists(filePath))
+        {
+            LoadFile(filePath);
+            MainTabControl.SelectedItem = TreeViewTab;
+        }
+        else
+        {
+            MessageBox.Show("Profile settings file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void LoadProfileMetaButton_Click(object sender, RoutedEventArgs e)
+    {
+        var filePath = CurrentProfileMetaPathTextBox.Text;
+        if (File.Exists(filePath))
+        {
+            LoadFile(filePath);
+            MainTabControl.SelectedItem = TreeViewTab;
+        }
+        else
+        {
+            MessageBox.Show("Profile meta file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void LoadProfileSaveButton_Click(object sender, RoutedEventArgs e)
+    {
+        var filePath = CurrentProfileSavePathTextBox.Text;
+        if (File.Exists(filePath))
+        {
+            LoadFile(filePath);
+            MainTabControl.SelectedItem = TreeViewTab;
+        }
+        else
+        {
+            MessageBox.Show("Profile save file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void OpenSettingsFolderButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var settingsPath = SettingsManager.Instance.GetSettingsFilePath();
+            var directory = Path.GetDirectoryName(settingsPath);
+
+            if (!string.IsNullOrEmpty(directory) && Directory.Exists(directory))
+            {
+                Process.Start("explorer.exe", directory);
+            }
+            else
+            {
+                MessageBox.Show("Settings directory not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Error opening settings folder: {ex.Message}");
+            MessageBox.Show($"Error opening settings folder: {ex.Message}", "Error",
+                          MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    #endregion
+
+    #region File Operations
 
     public void LoadFile(string filePath)
     {
@@ -123,14 +449,18 @@ public partial class MainWindow : Window
 
             // Parse the Lua table
             var parsedData = LuaTableConverter.ParseLuaTable(content);
-            _logger.Log($"Successfully parsed Lua table with {parsedData.Count} root items");
-
-            // Clear existing tree and populate with new data
+            _logger.Log($"Successfully parsed Lua table with {parsedData.Count} root items");            // Clear existing tree and populate with new data
             _treeNodes.Clear();
             PopulateTreeView(parsedData);
 
+            // Populate raw content tab
+            PopulateRawContentTab(content);
+
+            // Populate file info tab
+            PopulateFileInfoTab(filePath);
+
             StatusLabel.Content = $"Loaded: {System.IO.Path.GetFileName(filePath)}";
-            _logger.Log("File loaded successfully");            // Update Save as Lua button state
+            _logger.Log("File loaded successfully");// Update Save as Lua button state
             UpdateSaveAsLuaButtonState();
 
             // Setup file watching for derived Balatro files
@@ -609,4 +939,128 @@ public partial class MainWindow : Window
             }
         }
     }
+
+    private void PopulateRawContentTab(string content)
+    {
+        try
+        {
+            // Format the content with "return " prefix for proper Lua syntax
+            string formattedContent = "return " + content;
+            RawContentTextBox.Text = formattedContent;
+            _logger.Log($"Raw content tab populated with {formattedContent.Length} characters");
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Error populating raw content tab: {ex.Message}");
+            RawContentTextBox.Text = "Error displaying raw content: " + ex.Message;
+        }
+    }
+
+    private void PopulateFileInfoTab(string filePath)
+    {
+        try
+        {
+            var fileInfo = new FileInfo(filePath);
+
+            FilePathTextBox.Text = filePath;
+            FileSizeTextBox.Text = $"{fileInfo.Length:N0} bytes ({FormatFileSize(fileInfo.Length)})";
+            LastModifiedTextBox.Text = fileInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+            // Try to determine compression info
+            string compressionInfo = "Unknown";
+            try
+            {
+                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                using var deflateStream = new DeflateStream(stream, CompressionMode.Decompress);
+                compressionInfo = "Deflate compressed";
+            }
+            catch
+            {
+                compressionInfo = "Not compressed (plain text)";
+            }
+
+            CompressionInfoTextBox.Text = compressionInfo;
+            ContentTypeTextBox.Text = "Balatro Save Data (JKR)";
+
+            // Count entries by parsing if possible
+            if (!string.IsNullOrEmpty(_currentDecompressedContent))
+            {
+                try
+                {
+                    var parsedData = LuaTableConverter.ParseLuaTable(_currentDecompressedContent);
+                    int totalEntries = CountEntries(parsedData);
+                    EntriesCountTextBox.Text = $"{totalEntries:N0} entries";
+                }
+                catch
+                {
+                    EntriesCountTextBox.Text = "Unable to count entries";
+                }
+            }
+            else
+            {
+                EntriesCountTextBox.Text = "No content loaded";
+            }
+
+            _logger.Log("File info tab populated successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Error populating file info tab: {ex.Message}");
+            FilePathTextBox.Text = "Error: " + ex.Message;
+        }
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+
+    private int CountEntries(Dictionary<string, object> data)
+    {
+        int count = data.Count;
+        foreach (var value in data.Values)
+        {
+            if (value is Dictionary<string, object> dict)
+            {
+                count += CountEntries(dict);
+            }
+            else if (value is List<object> list)
+            {
+                count += CountListEntries(list);
+            }
+        }
+        return count;
+    }
+
+    private int CountListEntries(List<object> list)
+    {
+        int count = list.Count;
+        foreach (var item in list)
+        {
+            if (item is Dictionary<string, object> dict)
+            {
+                count += CountEntries(dict);
+            }
+            else if (item is List<object> subList)
+            {
+                count += CountListEntries(subList);
+            }
+        }
+        return count;
+    }
+
+    #endregion
+
+    #region UI Event Handlers
+
+
+    #endregion
 }

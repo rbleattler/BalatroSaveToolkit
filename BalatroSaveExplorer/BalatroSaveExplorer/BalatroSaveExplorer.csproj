@@ -6,7 +6,10 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>assets\joker_detective.ico</ApplicationIcon>
+    <ApplicationIcon>assets\detective.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="assets\images\" />
+  </ItemGroup>
 
 </Project>
