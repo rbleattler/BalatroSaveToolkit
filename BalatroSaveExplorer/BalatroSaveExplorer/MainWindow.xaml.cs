@@ -7,11 +7,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.IO;
 using System.IO.Compression;
 using System.Collections.ObjectModel;
+using BalatroSaveExplorer.Services;
+using BalatroSaveExplorer.Windows;
 
 namespace BalatroSaveExplorer;
 
@@ -23,8 +24,7 @@ public partial class MainWindow : Window
     private readonly Logger _logger;
     private readonly ObservableCollection<TreeNodeViewModel> _treeNodes;
     private string? _currentFilePath;
-    private string? _currentDecompressedContent;
-    public MainWindow()
+    private string? _currentDecompressedContent;    public MainWindow()
     {
         InitializeComponent();
 
@@ -35,28 +35,64 @@ public partial class MainWindow : Window
         // Subscribe to logger events
         _logger.LogAdded += OnLogAdded;
 
+        // Apply settings on startup
+        ApplySettings();
+
         _logger.Log("Application started");
     }
 
-    private void LoadFileButton_Click(object sender, RoutedEventArgs e)
+    /// <summary>
+    /// Applies current settings to the UI
+    /// </summary>
+    private void ApplySettings()
     {
+        var settings = SettingsManager.Instance.Settings;        // Show logs panel if configured to do so
+        if (settings.ShowLogsOnStartup)
+        {
+            ShowLogsCheckBox.IsChecked = true;
+            LogPanelRow.Height = new GridLength(200);
+        }
+    }    private void LoadFileButton_Click(object sender, RoutedEventArgs e)
+    {
+        var settings = SettingsManager.Instance.Settings;
         var openFileDialog = new OpenFileDialog
         {
             Filter = "JKR Files (*.jkr)|*.jkr|All Files (*.*)|*.*",
-            Title = "Select JKR File to Load"
-        };
-
-        if (openFileDialog.ShowDialog() == true)
+            Title = "Select JKR File to Load",
+            InitialDirectory = Directory.Exists(settings.DefaultJkrDirectory) ? settings.DefaultJkrDirectory : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+        };        if (openFileDialog.ShowDialog() == true)
         {
             LoadFile(openFileDialog.FileName);
         }
     }
-    private void LoadFile(string filePath)
+
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        var settingsWindow = new SettingsWindow()
+        {
+            Owner = this
+        };
+
+        if (settingsWindow.ShowDialog() == true)
+        {
+            // Settings were saved, apply them
+            ApplySettings();
+            _logger.Log("Settings updated and applied");
+        }
+    }    private void LoadFile(string filePath)
     {
         try
         {
             StatusLabel.Content = "Loading file...";
             _logger.Log($"Loading file: {filePath}");
+
+            var settings = SettingsManager.Instance.Settings;
+
+            // Create backup if enabled
+            if (settings.EnableAutoBackup)
+            {
+                CreateBackup(filePath, settings.BackupDirectory);
+            }
 
             // Read and decompress the file content
             string content = ReadAndDecompressJkrFile(filePath);
@@ -65,6 +101,12 @@ public partial class MainWindow : Window
             // Store the current file info
             _currentFilePath = filePath;
             _currentDecompressedContent = content;
+
+            // Auto-save decompressed content if enabled
+            if (settings.AutoSaveDecompressedFiles)
+            {
+                SaveDecompressedToTemp(content, filePath);
+            }
 
             // Parse the Lua table
             var parsedData = LuaTableConverter.ParseLuaTable(content);
@@ -149,9 +191,7 @@ public partial class MainWindow : Window
     {
         _logger.ClearLogs();
         LogTextBox.Text = "";
-    }
-
-    private void SaveAsLuaButton_Click(object sender, RoutedEventArgs e)
+    }    private void SaveAsLuaButton_Click(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrEmpty(_currentFilePath) || string.IsNullOrEmpty(_currentDecompressedContent))
         {
@@ -160,21 +200,53 @@ public partial class MainWindow : Window
         }
 
         try
-        {            // Generate the output path by replacing .jkr with .lua
-            string outputPath = System.IO.Path.ChangeExtension(_currentFilePath, ".lua");
-            _logger.Log($"Saving decompressed content to: {outputPath}");            // Prepend "return = " to the content
-            string luaContent = "return = " + _currentDecompressedContent;
+        {
+            var settings = SettingsManager.Instance.Settings;
 
-            // Write the content to the .lua file
-            File.WriteAllText(outputPath, luaContent, Encoding.UTF8);
+            // Use SaveFileDialog with default directory from settings
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "Lua Files (*.lua)|*.lua|All Files (*.*)|*.*",
+                Title = "Save as Lua File",
+                InitialDirectory = Directory.Exists(settings.DefaultLuaExportDirectory) ? settings.DefaultLuaExportDirectory : Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                FileName = Path.GetFileNameWithoutExtension(_currentFilePath) + ".lua"
+            };
 
-            _logger.Log($"Successfully saved {luaContent.Length} characters to {outputPath}");
-            StatusLabel.Content = $"Saved: {System.IO.Path.GetFileName(outputPath)}";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string outputPath = saveFileDialog.FileName;
 
-            // Update button state since the file now exists
-            UpdateSaveAsLuaButtonState();
+                // Check if file exists and confirm overwrite if settings require it
+                if (File.Exists(outputPath) && settings.ConfirmFileOverwrites)
+                {
+                    var result = MessageBox.Show(
+                        $"The file '{Path.GetFileName(outputPath)}' already exists. Do you want to overwrite it?",
+                        "File Exists",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
 
-            MessageBox.Show($"File saved successfully as:\n{outputPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (result != MessageBoxResult.Yes)
+                    {
+                        return;
+                    }
+                }
+
+                _logger.Log($"Saving decompressed content to: {outputPath}");
+
+                // Prepend "return = " to the content
+                string luaContent = "return = " + _currentDecompressedContent;
+
+                // Write the content to the .lua file
+                File.WriteAllText(outputPath, luaContent, Encoding.UTF8);
+
+                _logger.Log($"Successfully saved {luaContent.Length} characters to {outputPath}");
+                StatusLabel.Content = $"Saved: {Path.GetFileName(outputPath)}";
+
+                // Update button state since the file now exists
+                UpdateSaveAsLuaButtonState();
+
+                MessageBox.Show($"File saved successfully as:\n{outputPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
         catch (Exception ex)
         {
@@ -262,10 +334,54 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             _logger.Log($"Decompression failed: {ex.Message}");
-            _logger.Log("Attempting to read as plain text...");
-
-            // Fallback to reading as plain text (in case file is not compressed)
+            _logger.Log("Attempting to read as plain text...");            // Fallback to reading as plain text (in case file is not compressed)
             return File.ReadAllText(filePath);
+        }
+    }
+
+    /// <summary>
+    /// Creates a backup of the specified file
+    /// </summary>
+    private void CreateBackup(string filePath, string backupDirectory)
+    {
+        try
+        {
+            // Ensure backup directory exists
+            Directory.CreateDirectory(backupDirectory);
+
+            var fileName = Path.GetFileName(filePath);
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var backupFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{timestamp}{Path.GetExtension(fileName)}";
+            var backupPath = Path.Combine(backupDirectory, backupFileName);
+
+            File.Copy(filePath, backupPath);
+            _logger.Log($"Created backup: {backupPath}");
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Failed to create backup: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Saves decompressed content to a temporary file
+    /// </summary>
+    private void SaveDecompressedToTemp(string content, string originalFilePath)
+    {
+        try
+        {
+            var tempDir = Path.GetTempPath();
+            var fileName = Path.GetFileNameWithoutExtension(originalFilePath);
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var tempFileName = $"{fileName}_decompressed_{timestamp}.lua";
+            var tempPath = Path.Combine(tempDir, tempFileName);
+
+            File.WriteAllText(tempPath, content, Encoding.UTF8);
+            _logger.Log($"Auto-saved decompressed content to: {tempPath}");
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Failed to auto-save decompressed content: {ex.Message}");
         }
     }
 }
