@@ -17,10 +17,15 @@ public class AppSettings : INotifyPropertyChanged
     private bool _showLogsOnStartup = false;
     private bool _autoSaveDecompressedFiles = false;
     private bool _confirmFileOverwrites = true;
-    private string _logLevel = "Info";
-    private int _maxLogEntries = 1000;    private bool _enableAutoBackup = true;
+    private string _logLevel = "Info";    private int _maxLogEntries = 1000;
+    private bool _enableAutoBackup = true;
     private string _backupDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BalatroBackups");
     private string _balatroSaveRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Balatro");
+
+    // File watching settings
+    private bool _enableFileWatching = true;
+    private bool _flashTaskbarOnUpdate = true;
+    private bool _autoRefreshOnFileChange = true;
 
     /// <summary>
     /// Default directory for opening JKR files
@@ -151,12 +156,37 @@ public class AppSettings : INotifyPropertyChanged
     /// <summary>
     /// Path to current profile's meta file (derived)
     /// </summary>
-    public string CurrentProfileMetaPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "meta.jkr");
-
-    /// <summary>
+    public string CurrentProfileMetaPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "meta.jkr");    /// <summary>
     /// Path to current profile's save file (derived)
     /// </summary>
     public string CurrentProfileSavePath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "save.jkr");
+
+    /// <summary>
+    /// Whether to enable file watching for derived JKR files
+    /// </summary>
+    public bool EnableFileWatching
+    {
+        get => _enableFileWatching;
+        set => SetProperty(ref _enableFileWatching, value);
+    }
+
+    /// <summary>
+    /// Whether to flash taskbar when watched files are updated
+    /// </summary>
+    public bool FlashTaskbarOnUpdate
+    {
+        get => _flashTaskbarOnUpdate;
+        set => SetProperty(ref _flashTaskbarOnUpdate, value);
+    }
+
+    /// <summary>
+    /// Whether to automatically refresh the view when watched files change
+    /// </summary>
+    public bool AutoRefreshOnFileChange
+    {
+        get => _autoRefreshOnFileChange;
+        set => SetProperty(ref _autoRefreshOnFileChange, value);
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

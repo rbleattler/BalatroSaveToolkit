@@ -12,12 +12,21 @@
             <Button x:Name="SaveAsLuaButton" Content="Save as Lua" Width="120" Height="30"
                     Click="SaveAsLuaButton_Click" Margin="0,0,10,0" IsEnabled="False"/>
             <Button x:Name="SettingsButton" Content="Settings" Width="80" Height="30"
-                    Click="SettingsButton_Click" Margin="0,0,10,0"/>
-            <CheckBox x:Name="ShowLogsCheckBox" Content="Show Logs"
+                    Click="SettingsButton_Click" Margin="0,0,10,0"/>            <CheckBox x:Name="ShowLogsCheckBox" Content="Show Logs"
                      VerticalAlignment="Center" Checked="ShowLogsCheckBox_Checked"
                      Unchecked="ShowLogsCheckBox_Unchecked"/>
             <Label x:Name="StatusLabel" Content="Ready" Margin="20,0,0,0"
                    VerticalAlignment="Center" Foreground="DarkBlue"/>
+
+            <!-- File watching status -->
+            <StackPanel Orientation="Horizontal" Margin="20,0,0,0" VerticalAlignment="Center">
+                <Ellipse x:Name="WatchingIndicator" Width="8" Height="8"
+                         Fill="Gray" Margin="0,0,5,0" VerticalAlignment="Center"
+                         Visibility="Collapsed"/>
+                <Label x:Name="LastUpdateLabel" Content="" FontSize="10"
+                       Foreground="DarkGray" VerticalAlignment="Center"
+                       Visibility="Collapsed"/>
+            </StackPanel>
         </StackPanel>
 
         <!-- Main content area -->

@@ -13,6 +13,8 @@ using System.IO.Compression;
 using System.Collections.ObjectModel;
 using BalatroSaveExplorer.Services;
 using BalatroSaveExplorer.Windows;
+using System.Windows.Shell;
+using System.Windows.Threading;
 
 namespace BalatroSaveExplorer;
 
@@ -20,17 +22,26 @@ namespace BalatroSaveExplorer;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : Window
-{
-    private readonly Logger _logger;
+{    private readonly Logger _logger;
     private readonly ObservableCollection<TreeNodeViewModel> _treeNodes;
     private string? _currentFilePath;
-    private string? _currentDecompressedContent;    public MainWindow()
+    private string? _currentDecompressedContent;
+    private FileSystemWatcher? _fileWatcher;
+    private DateTime _lastFileUpdate;
+    private bool _isWatchingDerivedFile;
+    private DispatcherTimer _flashTimer;
+    private int _flashCount;    public MainWindow()
     {
         InitializeComponent();
 
         _logger = new Logger();
         _treeNodes = new ObservableCollection<TreeNodeViewModel>();
         DataTreeView.ItemsSource = _treeNodes;
+
+        // Initialize flash timer for taskbar notifications
+        _flashTimer = new DispatcherTimer();
+        _flashTimer.Interval = TimeSpan.FromMilliseconds(500);
+        _flashTimer.Tick += FlashTimer_Tick;
 
         // Subscribe to logger events
         _logger.LogAdded += OnLogAdded;
@@ -119,10 +130,11 @@ public partial class MainWindow : Window
             PopulateTreeView(parsedData);
 
             StatusLabel.Content = $"Loaded: {System.IO.Path.GetFileName(filePath)}";
-            _logger.Log("File loaded successfully");
-
-            // Update Save as Lua button state
+            _logger.Log("File loaded successfully");            // Update Save as Lua button state
             UpdateSaveAsLuaButtonState();
+
+            // Setup file watching for derived Balatro files
+            SetupFileWatching(filePath);
         }
         catch (Exception ex)
         {
@@ -294,9 +306,11 @@ public partial class MainWindow : Window
             LogTextBox.AppendText(logMessage + Environment.NewLine);
             LogTextBox.ScrollToEnd();
         });
-    }
-    protected override void OnClosed(EventArgs e)
+    }    protected override void OnClosed(EventArgs e)
     {
+        // Clean up file watching resources
+        StopFileWatching();
+
         _logger.SaveToFile();
         base.OnClosed(e);
     }
@@ -376,14 +390,223 @@ public partial class MainWindow : Window
             var fileName = Path.GetFileNameWithoutExtension(originalFilePath);
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var tempFileName = $"{fileName}_decompressed_{timestamp}.lua";
-            var tempPath = Path.Combine(tempDir, tempFileName);
-
-            File.WriteAllText(tempPath, content, Encoding.UTF8);
+            var tempPath = Path.Combine(tempDir, tempFileName);            File.WriteAllText(tempPath, content, Encoding.UTF8);
             _logger.Log($"Auto-saved decompressed content to: {tempPath}");
         }
         catch (Exception ex)
         {
             _logger.Log($"Failed to auto-save decompressed content: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Sets up file watching for a derived JKR file
+    /// </summary>
+    private void SetupFileWatching(string filePath)
+    {
+        var settings = SettingsManager.Instance.Settings;
+
+        if (!settings.EnableFileWatching)
+        {
+            return;
+        }
+
+        // Stop any existing watcher
+        StopFileWatching();
+
+        // Check if this is a derived Balatro file
+        if (IsDerivedBalatroFile(filePath))
+        {
+            try
+            {
+                var directory = Path.GetDirectoryName(filePath);
+                var fileName = Path.GetFileName(filePath);
+
+                if (!string.IsNullOrEmpty(directory) && !string.IsNullOrEmpty(fileName) && Directory.Exists(directory))
+                {
+                    _fileWatcher = new FileSystemWatcher(directory, fileName);
+                    _fileWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
+                    _fileWatcher.Changed += OnFileChanged;
+                    _fileWatcher.EnableRaisingEvents = true;
+                    _isWatchingDerivedFile = true;
+                    _lastFileUpdate = File.GetLastWriteTime(filePath);
+
+                    UpdateWatchingIndicator(true);
+                    _logger.Log($"Started watching file: {filePath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Log($"Failed to setup file watching: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Stops file watching
+    /// </summary>
+    private void StopFileWatching()
+    {
+        if (_fileWatcher != null)
+        {
+            _fileWatcher.EnableRaisingEvents = false;
+            _fileWatcher.Dispose();
+            _fileWatcher = null;
+            _isWatchingDerivedFile = false;
+            UpdateWatchingIndicator(false);
+            _logger.Log("Stopped file watching");
+        }
+    }
+
+    /// <summary>
+    /// Checks if the file is a derived Balatro file that should be watched
+    /// </summary>
+    private bool IsDerivedBalatroFile(string filePath)
+    {
+        var settings = SettingsManager.Instance.Settings;
+        var normalizedPath = Path.GetFullPath(filePath).ToLowerInvariant();
+        var normalizedRoot = Path.GetFullPath(settings.BalatroSaveRoot).ToLowerInvariant();
+
+        return normalizedPath.StartsWith(normalizedRoot) &&
+               (normalizedPath.EndsWith("profile.jkr") ||
+                normalizedPath.EndsWith("meta.jkr") ||
+                normalizedPath.EndsWith("save.jkr") ||
+                normalizedPath.EndsWith("settings.jkr"));
+    }
+
+    /// <summary>
+    /// Handles file change events
+    /// </summary>
+    private void OnFileChanged(object sender, FileSystemEventArgs e)
+    {
+        try
+        {
+            // Debounce multiple rapid file changes
+            var lastWrite = File.GetLastWriteTime(e.FullPath);
+            if (lastWrite <= _lastFileUpdate.AddMilliseconds(500))
+            {
+                return;
+            }
+
+            _lastFileUpdate = lastWrite;
+
+            Dispatcher.Invoke(() =>
+            {
+                var settings = SettingsManager.Instance.Settings;
+
+                _logger.Log($"File changed: {e.FullPath}");
+                UpdateLastUpdateIndicator(lastWrite);
+
+                // Flash taskbar if enabled
+                if (settings.FlashTaskbarOnUpdate)
+                {
+                    FlashTaskbar();
+                }
+
+                // Auto-refresh if enabled
+                if (settings.AutoRefreshOnFileChange)
+                {
+                    RefreshCurrentFile();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            Dispatcher.Invoke(() => _logger.Log($"Error handling file change: {ex.Message}"));
+        }
+    }
+
+    /// <summary>
+    /// Updates the file watching indicator
+    /// </summary>
+    private void UpdateWatchingIndicator(bool isWatching)
+    {
+        if (isWatching)
+        {
+            WatchingIndicator.Fill = Brushes.LimeGreen;
+            WatchingIndicator.Visibility = Visibility.Visible;
+            LastUpdateLabel.Visibility = Visibility.Visible;
+            UpdateLastUpdateIndicator(_lastFileUpdate);
+        }
+        else
+        {
+            WatchingIndicator.Visibility = Visibility.Collapsed;
+            LastUpdateLabel.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    /// <summary>
+    /// Updates the last update time indicator
+    /// </summary>
+    private void UpdateLastUpdateIndicator(DateTime updateTime)
+    {
+        LastUpdateLabel.Content = $"Updated: {updateTime:HH:mm:ss}";
+    }
+
+    /// <summary>
+    /// Flashes the taskbar icon
+    /// </summary>
+    private void FlashTaskbar()
+    {
+        _flashCount = 0;
+        _flashTimer.Start();
+    }
+
+    /// <summary>
+    /// Timer tick event for taskbar flashing
+    /// </summary>
+    private void FlashTimer_Tick(object? sender, EventArgs e)
+    {
+        var taskbarItemInfo = TaskbarItemInfo ?? new TaskbarItemInfo();
+
+        if (_flashCount % 2 == 0)
+        {
+            taskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
+            taskbarItemInfo.ProgressValue = 1.0;
+        }
+        else
+        {
+            taskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+        }
+
+        TaskbarItemInfo = taskbarItemInfo;
+        _flashCount++;
+
+        if (_flashCount >= 6) // Flash 3 times
+        {
+            _flashTimer.Stop();
+            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+        }
+    }
+
+    /// <summary>
+    /// Refreshes the current file by reloading it
+    /// </summary>
+    private void RefreshCurrentFile()
+    {
+        if (!string.IsNullOrEmpty(_currentFilePath) && File.Exists(_currentFilePath))
+        {
+            _logger.Log("Auto-refreshing current file...");
+
+            // Temporarily disable file watching to avoid recursive updates
+            var wasWatching = _isWatchingDerivedFile;
+            if (wasWatching)
+            {
+                _fileWatcher!.EnableRaisingEvents = false;
+            }
+
+            try
+            {
+                LoadFile(_currentFilePath);
+            }
+            finally
+            {
+                // Re-enable file watching
+                if (wasWatching && _fileWatcher != null)
+                {
+                    _fileWatcher.EnableRaisingEvents = true;
+                }
+            }
         }
     }
 }

@@ -32,8 +32,7 @@ public partial class SettingsWindow : Window
          /// Creates a deep copy of the settings object
          /// </summary>
     private AppSettings CloneSettings(AppSettings original)
-    {
-        return new AppSettings
+    {        return new AppSettings
         {
             DefaultJkrDirectory = original.DefaultJkrDirectory,
             DefaultLuaExportDirectory = original.DefaultLuaExportDirectory,
@@ -44,7 +43,10 @@ public partial class SettingsWindow : Window
             MaxLogEntries = original.MaxLogEntries,
             EnableAutoBackup = original.EnableAutoBackup,
             BackupDirectory = original.BackupDirectory,
-            BalatroSaveRoot = original.BalatroSaveRoot
+            BalatroSaveRoot = original.BalatroSaveRoot,
+            EnableFileWatching = original.EnableFileWatching,
+            FlashTaskbarOnUpdate = original.FlashTaskbarOnUpdate,
+            AutoRefreshOnFileChange = original.AutoRefreshOnFileChange
         };
     }    /// <summary>
          /// Loads the working settings into the UI controls
@@ -55,11 +57,15 @@ public partial class SettingsWindow : Window
         DefaultLuaExportDirectoryTextBox.Text = _workingSettings.DefaultLuaExportDirectory;
         ShowLogsOnStartupCheckBox.IsChecked = _workingSettings.ShowLogsOnStartup;
         AutoSaveDecompressedFilesCheckBox.IsChecked = _workingSettings.AutoSaveDecompressedFiles;
-        ConfirmFileOverwritesCheckBox.IsChecked = _workingSettings.ConfirmFileOverwrites;
-        EnableAutoBackupCheckBox.IsChecked = _workingSettings.EnableAutoBackup;
+        ConfirmFileOverwritesCheckBox.IsChecked = _workingSettings.ConfirmFileOverwrites;        EnableAutoBackupCheckBox.IsChecked = _workingSettings.EnableAutoBackup;
         BackupDirectoryTextBox.Text = _workingSettings.BackupDirectory;
         BalatroSaveRootTextBox.Text = _workingSettings.BalatroSaveRoot;
         MaxLogEntriesTextBox.Text = _workingSettings.MaxLogEntries.ToString();
+
+        // File watching settings
+        EnableFileWatchingCheckBox.IsChecked = _workingSettings.EnableFileWatching;
+        FlashTaskbarOnUpdateCheckBox.IsChecked = _workingSettings.FlashTaskbarOnUpdate;
+        AutoRefreshOnFileChangeCheckBox.IsChecked = _workingSettings.AutoRefreshOnFileChange;
 
         // Set the log level combobox
         foreach (ComboBoxItem item in LogLevelComboBox.Items)
@@ -87,6 +93,11 @@ public partial class SettingsWindow : Window
         _workingSettings.BackupDirectory = BackupDirectoryTextBox.Text;
         _workingSettings.BalatroSaveRoot = BalatroSaveRootTextBox.Text;
 
+        // File watching settings
+        _workingSettings.EnableFileWatching = EnableFileWatchingCheckBox.IsChecked ?? true;
+        _workingSettings.FlashTaskbarOnUpdate = FlashTaskbarOnUpdateCheckBox.IsChecked ?? true;
+        _workingSettings.AutoRefreshOnFileChange = AutoRefreshOnFileChangeCheckBox.IsChecked ?? true;
+
         if (int.TryParse(MaxLogEntriesTextBox.Text, out int maxLogEntries))
         {
             _workingSettings.MaxLogEntries = maxLogEntries;
@@ -109,10 +120,14 @@ public partial class SettingsWindow : Window
         settings.AutoSaveDecompressedFiles = _workingSettings.AutoSaveDecompressedFiles;
         settings.ConfirmFileOverwrites = _workingSettings.ConfirmFileOverwrites;
         settings.LogLevel = _workingSettings.LogLevel;
-        settings.MaxLogEntries = _workingSettings.MaxLogEntries;
-        settings.EnableAutoBackup = _workingSettings.EnableAutoBackup;
+        settings.MaxLogEntries = _workingSettings.MaxLogEntries;        settings.EnableAutoBackup = _workingSettings.EnableAutoBackup;
         settings.BackupDirectory = _workingSettings.BackupDirectory;
         settings.BalatroSaveRoot = _workingSettings.BalatroSaveRoot;
+
+        // File watching settings
+        settings.EnableFileWatching = _workingSettings.EnableFileWatching;
+        settings.FlashTaskbarOnUpdate = _workingSettings.FlashTaskbarOnUpdate;
+        settings.AutoRefreshOnFileChange = _workingSettings.AutoRefreshOnFileChange;
 
         SettingsManager.Instance.SaveSettings();
     }
@@ -198,10 +213,14 @@ public partial class SettingsWindow : Window
             _workingSettings.ShowLogsOnStartup = defaultSettings.ShowLogsOnStartup;
             _workingSettings.AutoSaveDecompressedFiles = defaultSettings.AutoSaveDecompressedFiles;
             _workingSettings.ConfirmFileOverwrites = defaultSettings.ConfirmFileOverwrites; _workingSettings.LogLevel = defaultSettings.LogLevel;
-            _workingSettings.MaxLogEntries = defaultSettings.MaxLogEntries;
-            _workingSettings.EnableAutoBackup = defaultSettings.EnableAutoBackup;
+            _workingSettings.MaxLogEntries = defaultSettings.MaxLogEntries;            _workingSettings.EnableAutoBackup = defaultSettings.EnableAutoBackup;
             _workingSettings.BackupDirectory = defaultSettings.BackupDirectory;
             _workingSettings.BalatroSaveRoot = defaultSettings.BalatroSaveRoot;
+
+            // File watching settings
+            _workingSettings.EnableFileWatching = defaultSettings.EnableFileWatching;
+            _workingSettings.FlashTaskbarOnUpdate = defaultSettings.FlashTaskbarOnUpdate;
+            _workingSettings.AutoRefreshOnFileChange = defaultSettings.AutoRefreshOnFileChange;
 
             LoadSettingsIntoControls();
         }

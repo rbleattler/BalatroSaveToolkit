@@ -58,9 +58,23 @@
                                           Content="Confirm before overwriting existing files"
                                           Margin="0,0,0,5"/>
                                 <CheckBox x:Name="EnableAutoBackupCheckBox"
-                                          Content="Enable automatic backup of JKR files before processing"/>
+                                          Content="Enable automatic backup of JKR files before processing"/>                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="File Watching" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <CheckBox x:Name="EnableFileWatchingCheckBox"
+                                          Content="Enable file watching for derived Balatro files"
+                                          Margin="0,0,0,5"/>
+                                <CheckBox x:Name="FlashTaskbarOnUpdateCheckBox"
+                                          Content="Flash taskbar when watched files are updated"
+                                          Margin="0,0,0,5"/>
+                                <CheckBox x:Name="AutoRefreshOnFileChangeCheckBox"
+                                          Content="Automatically refresh view when watched files change"/>
                             </StackPanel>
-                        </GroupBox>                        <GroupBox Header="Backup Settings" Margin="0,0,0,15">
+                        </GroupBox>
+
+                        <GroupBox Header="Backup Settings" Margin="0,0,0,15">
                             <StackPanel Margin="10">
                                 <Label Content="Backup Directory:"/>
                                 <Grid>
