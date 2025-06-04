@@ -140,9 +140,7 @@ public class SettingsManager
             var backupPath = _settingsFilePath + $".backup.{DateTime.Now:yyyyMMdd_HHmmss}";
             File.Copy(_settingsFilePath, backupPath);
         }
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Validates that all directory paths in settings exist and are accessible
     /// </summary>
     public void ValidateSettings()
@@ -163,6 +161,30 @@ public class SettingsManager
             if (!Directory.Exists(_settings.BackupDirectory))
             {
                 Directory.CreateDirectory(_settings.BackupDirectory);
+            }
+
+            // Validate Balatro save root directory
+            if (!Directory.Exists(_settings.BalatroSaveRoot))
+            {
+                // Try to find default Balatro directory
+                var defaultBalatroPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Balatro");
+                if (Directory.Exists(defaultBalatroPath))
+                {
+                    _settings.BalatroSaveRoot = defaultBalatroPath;
+                }
+                else
+                {
+                    // Create the directory structure as a fallback
+                    try
+                    {
+                        Directory.CreateDirectory(_settings.BalatroSaveRoot);
+                    }
+                    catch
+                    {
+                        // If we can't create it, reset to default AppData path
+                        _settings.BalatroSaveRoot = defaultBalatroPath;
+                    }
+                }
             }
         }
         catch (Exception ex)

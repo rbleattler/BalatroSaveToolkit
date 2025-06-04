@@ -28,9 +28,7 @@ public partial class SettingsWindow : Window
 
         // Set the settings file path for display
         SettingsFilePathTextBox.Text = SettingsManager.Instance.GetSettingsFilePath();
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Creates a deep copy of the settings object
     /// </summary>
     private AppSettings CloneSettings(AppSettings original)
@@ -45,11 +43,10 @@ public partial class SettingsWindow : Window
             LogLevel = original.LogLevel,
             MaxLogEntries = original.MaxLogEntries,
             EnableAutoBackup = original.EnableAutoBackup,
-            BackupDirectory = original.BackupDirectory
+            BackupDirectory = original.BackupDirectory,
+            BalatroSaveRoot = original.BalatroSaveRoot
         };
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Loads the working settings into the UI controls
     /// </summary>
     private void LoadSettingsIntoControls()
@@ -61,6 +58,7 @@ public partial class SettingsWindow : Window
         ConfirmFileOverwritesCheckBox.IsChecked = _workingSettings.ConfirmFileOverwrites;
         EnableAutoBackupCheckBox.IsChecked = _workingSettings.EnableAutoBackup;
         BackupDirectoryTextBox.Text = _workingSettings.BackupDirectory;
+        BalatroSaveRootTextBox.Text = _workingSettings.BalatroSaveRoot;
         MaxLogEntriesTextBox.Text = _workingSettings.MaxLogEntries.ToString();
 
         // Set the log level combobox
@@ -72,9 +70,10 @@ public partial class SettingsWindow : Window
                 break;
             }
         }
-    }
 
-    /// <summary>
+        // Update derived path displays
+        UpdateBalatroDerivedPaths();
+    }    /// <summary>
     /// Saves the UI control values back to the working settings
     /// </summary>
     private void SaveControlsToSettings()
@@ -86,6 +85,7 @@ public partial class SettingsWindow : Window
         _workingSettings.ConfirmFileOverwrites = ConfirmFileOverwritesCheckBox.IsChecked ?? true;
         _workingSettings.EnableAutoBackup = EnableAutoBackupCheckBox.IsChecked ?? true;
         _workingSettings.BackupDirectory = BackupDirectoryTextBox.Text;
+        _workingSettings.BalatroSaveRoot = BalatroSaveRootTextBox.Text;
 
         if (int.TryParse(MaxLogEntriesTextBox.Text, out int maxLogEntries))
         {
@@ -96,9 +96,7 @@ public partial class SettingsWindow : Window
         {
             _workingSettings.LogLevel = selectedItem.Content.ToString() ?? "Info";
         }
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Applies the working settings to the global settings manager
     /// </summary>
     private void ApplySettings()
@@ -114,6 +112,7 @@ public partial class SettingsWindow : Window
         settings.MaxLogEntries = _workingSettings.MaxLogEntries;
         settings.EnableAutoBackup = _workingSettings.EnableAutoBackup;
         settings.BackupDirectory = _workingSettings.BackupDirectory;
+        settings.BalatroSaveRoot = _workingSettings.BalatroSaveRoot;
 
         SettingsManager.Instance.SaveSettings();
     }
@@ -198,13 +197,52 @@ public partial class SettingsWindow : Window
             _workingSettings.DefaultLuaExportDirectory = defaultSettings.DefaultLuaExportDirectory;
             _workingSettings.ShowLogsOnStartup = defaultSettings.ShowLogsOnStartup;
             _workingSettings.AutoSaveDecompressedFiles = defaultSettings.AutoSaveDecompressedFiles;
-            _workingSettings.ConfirmFileOverwrites = defaultSettings.ConfirmFileOverwrites;
-            _workingSettings.LogLevel = defaultSettings.LogLevel;
+            _workingSettings.ConfirmFileOverwrites = defaultSettings.ConfirmFileOverwrites;            _workingSettings.LogLevel = defaultSettings.LogLevel;
             _workingSettings.MaxLogEntries = defaultSettings.MaxLogEntries;
             _workingSettings.EnableAutoBackup = defaultSettings.EnableAutoBackup;
             _workingSettings.BackupDirectory = defaultSettings.BackupDirectory;
+            _workingSettings.BalatroSaveRoot = defaultSettings.BalatroSaveRoot;
 
             LoadSettingsIntoControls();
+        }
+    }
+
+    private void BrowseBalatroSaveRootButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = "Select Balatro Save Root Directory",
+            InitialDirectory = BalatroSaveRootTextBox.Text
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            BalatroSaveRootTextBox.Text = dialog.FolderName;
+            _workingSettings.BalatroSaveRoot = dialog.FolderName;
+            UpdateBalatroDerivedPaths();
+        }
+    }
+
+    /// <summary>
+    /// Updates the derived path displays for Balatro integration
+    /// </summary>
+    private void UpdateBalatroDerivedPaths()
+    {
+        try
+        {
+            BalatroSettingsFilePathTextBox.Text = _workingSettings.BalatroSettingsFilePath;
+            CurrentProfileNumberTextBox.Text = $"Profile {_workingSettings.CurrentProfileNumber}";
+            CurrentProfileSettingsPathTextBox.Text = _workingSettings.CurrentProfileSettingsPath;
+            CurrentProfileMetaPathTextBox.Text = _workingSettings.CurrentProfileMetaPath;
+            CurrentProfileSavePathTextBox.Text = _workingSettings.CurrentProfileSavePath;
+        }
+        catch (Exception ex)
+        {
+            // If there's an error reading the profile, show error message in the profile text box
+            CurrentProfileNumberTextBox.Text = $"Error: {ex.Message}";
+            CurrentProfileSettingsPathTextBox.Text = "N/A";
+            CurrentProfileMetaPathTextBox.Text = "N/A";
+            CurrentProfileSavePathTextBox.Text = "N/A";
         }
     }
 

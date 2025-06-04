@@ -1,6 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BalatroSaveExplorer.Models;
 
@@ -15,9 +18,9 @@ public class AppSettings : INotifyPropertyChanged
     private bool _autoSaveDecompressedFiles = false;
     private bool _confirmFileOverwrites = true;
     private string _logLevel = "Info";
-    private int _maxLogEntries = 1000;
-    private bool _enableAutoBackup = true;
+    private int _maxLogEntries = 1000;    private bool _enableAutoBackup = true;
     private string _backupDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BalatroBackups");
+    private string _balatroSaveRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Balatro");
 
     /// <summary>
     /// Default directory for opening JKR files
@@ -89,9 +92,7 @@ public class AppSettings : INotifyPropertyChanged
     {
         get => _enableAutoBackup;
         set => SetProperty(ref _enableAutoBackup, value);
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Directory for storing automatic backups
     /// </summary>
     public string BackupDirectory
@@ -100,18 +101,103 @@ public class AppSettings : INotifyPropertyChanged
         set => SetProperty(ref _backupDirectory, value);
     }
 
+    /// <summary>
+    /// Root directory for Balatro save files (configurable)
+    /// </summary>
+    public string BalatroSaveRoot
+    {
+        get => _balatroSaveRoot;
+        set => SetProperty(ref _balatroSaveRoot, value);
+    }
+
+    /// <summary>
+    /// Path to Balatro's main settings file (derived)
+    /// </summary>
+    public string BalatroSettingsFilePath => Path.Combine(BalatroSaveRoot, "settings.jkr");    /// <summary>
+    /// Current profile number (derived from settings.jkr)
+    /// </summary>
+    public int CurrentProfileNumber
+    {
+        get
+        {
+            try
+            {
+                if (File.Exists(BalatroSettingsFilePath))
+                {
+                    // Read and parse the settings.jkr file to get the current profile
+                    var settingsContent = ReadAndDecompressJkrFile(BalatroSettingsFilePath);
+
+                    // Simple regex-based parsing to find profile value
+                    var match = System.Text.RegularExpressions.Regex.Match(settingsContent, @"profile\s*=\s*(\d+)");
+                    if (match.Success && int.TryParse(match.Groups[1].Value, out int profileNum))
+                    {
+                        return profileNum;
+                    }
+                }
+            }
+            catch
+            {
+                // If we can't read the file or parse it, fall back to default
+            }
+            return 1; // Default profile
+        }
+    }
+
+    /// <summary>
+    /// Path to current profile's settings file (derived)
+    /// </summary>
+    public string CurrentProfileSettingsPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "profile.jkr");
+
+    /// <summary>
+    /// Path to current profile's meta file (derived)
+    /// </summary>
+    public string CurrentProfileMetaPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "meta.jkr");
+
+    /// <summary>
+    /// Path to current profile's save file (derived)
+    /// </summary>
+    public string CurrentProfileSavePath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "save.jkr");
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    }    protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
         field = value;
         OnPropertyChanged(propertyName);
         return true;
+    }
+
+    /// <summary>
+    /// Helper method to read and decompress JKR files for profile detection
+    /// </summary>
+    private string ReadAndDecompressJkrFile(string filePath)
+    {
+        try
+        {
+            using var compressedStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            using var outputStream = new MemoryStream();
+            using var deflateStream = new System.IO.Compression.DeflateStream(compressedStream, System.IO.Compression.CompressionMode.Decompress);
+
+            deflateStream.CopyTo(outputStream);
+            var decompressedBytes = outputStream.ToArray();
+            var content = System.Text.Encoding.UTF8.GetString(decompressedBytes);
+
+            // Remove "return = " prefix if present
+            if (content.StartsWith("return = "))
+            {
+                content = content.Substring(9);
+            }
+
+            return content;
+        }
+        catch
+        {
+            // If decompression fails, try reading as plain text
+            return File.ReadAllText(filePath);
+        }
     }
 }

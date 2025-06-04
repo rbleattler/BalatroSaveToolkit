@@ -60,9 +60,7 @@
                                 <CheckBox x:Name="EnableAutoBackupCheckBox"
                                           Content="Enable automatic backup of JKR files before processing"/>
                             </StackPanel>
-                        </GroupBox>
-
-                        <GroupBox Header="Backup Settings" Margin="0,0,0,15">
+                        </GroupBox>                        <GroupBox Header="Backup Settings" Margin="0,0,0,15">
                             <StackPanel Margin="10">
                                 <Label Content="Backup Directory:"/>
                                 <Grid>
@@ -76,6 +74,46 @@
                                             Content="Browse..." Width="80" Height="25"
                                             Click="BrowseBackupDirectoryButton_Click"/>
                                 </Grid>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Balatro Integration" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <Label Content="Balatro Save Root Directory:"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="BalatroSaveRootTextBox" Grid.Column="0"
+                                             VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <Button x:Name="BrowseBalatroSaveRootButton" Grid.Column="1"
+                                            Content="Browse..." Width="80" Height="25"
+                                            Click="BrowseBalatroSaveRootButton_Click"/>
+                                </Grid>
+
+                                <Separator Margin="0,5,0,10"/>
+                                <Label Content="Derived Paths (Read-only):" FontWeight="Bold"/>
+
+                                <Label Content="Settings File:" Margin="0,5,0,0"/>
+                                <TextBox x:Name="BalatroSettingsFilePathTextBox" IsReadOnly="True"
+                                         Background="LightGray" Margin="0,0,0,5"/>
+
+                                <Label Content="Current Profile:" Margin="0,5,0,0"/>
+                                <TextBox x:Name="CurrentProfileNumberTextBox" IsReadOnly="True"
+                                         Background="LightGray" Margin="0,0,0,5"/>
+
+                                <Label Content="Profile Settings:" Margin="0,5,0,0"/>
+                                <TextBox x:Name="CurrentProfileSettingsPathTextBox" IsReadOnly="True"
+                                         Background="LightGray" Margin="0,0,0,5"/>
+
+                                <Label Content="Profile Meta:" Margin="0,5,0,0"/>
+                                <TextBox x:Name="CurrentProfileMetaPathTextBox" IsReadOnly="True"
+                                         Background="LightGray" Margin="0,0,0,5"/>
+
+                                <Label Content="Profile Save:" Margin="0,5,0,0"/>
+                                <TextBox x:Name="CurrentProfileSavePathTextBox" IsReadOnly="True"
+                                         Background="LightGray" Margin="0,0,0,5"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
