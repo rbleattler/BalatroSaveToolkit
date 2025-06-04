@@ -12,7 +12,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Collections.ObjectModel;
 using BalatroSaveExplorer.Services;
-using BalatroSaveExplorer.Windows;
 using BalatroSaveExplorer.Models;
 using System.Windows.Shell;
 using System.Windows.Threading;
@@ -299,44 +298,43 @@ public partial class MainWindow : Window
     private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         UpdateBalatroDerivedPaths();
-    }
-
-    private void UpdateBalatroDerivedPaths()
+    }    private void UpdateBalatroDerivedPaths()
     {
         var saveRoot = BalatroSaveRootTextBox.Text;
 
         if (string.IsNullOrWhiteSpace(saveRoot))
         {
-            BalatroSettingsFilePathTextBox.Text = "";
-            CurrentProfileNumberTextBox.Text = "";
-            CurrentProfileSettingsPathTextBox.Text = "";
-            CurrentProfileMetaPathTextBox.Text = "";
-            CurrentProfileSavePathTextBox.Text = "";
+            // Clear Info tab controls
+            InfoBalatroSaveRootTextBox.Text = "";
+            InfoBalatroSettingsFilePathTextBox.Text = "";
+            InfoCurrentProfileNumberTextBox.Text = "";
+            InfoCurrentProfileSettingsPathTextBox.Text = "";
+            InfoCurrentProfileMetaPathTextBox.Text = "";
+            InfoCurrentProfileSavePathTextBox.Text = "";
             return;
         }
 
         try
         {
             var settingsPath = Path.Combine(saveRoot, "settings.jkr");
-            BalatroSettingsFilePathTextBox.Text = settingsPath;
 
-            // Try to determine current profile (this is a placeholder - would need actual logic)
-            CurrentProfileNumberTextBox.Text = "1"; // Default profile
+            // Update Info tab controls
+            InfoBalatroSaveRootTextBox.Text = saveRoot;
+            InfoBalatroSettingsFilePathTextBox.Text = settingsPath;
+            InfoCurrentProfileNumberTextBox.Text = "1"; // Default profile
 
             var profilePath = Path.Combine(saveRoot, "1");
-            CurrentProfileSettingsPathTextBox.Text = Path.Combine(profilePath, "profile.jkr");
-            CurrentProfileMetaPathTextBox.Text = Path.Combine(profilePath, "meta.jkr");
-            CurrentProfileSavePathTextBox.Text = Path.Combine(profilePath, "save.jkr");
+            InfoCurrentProfileSettingsPathTextBox.Text = Path.Combine(profilePath, "profile.jkr");
+            InfoCurrentProfileMetaPathTextBox.Text = Path.Combine(profilePath, "meta.jkr");
+            InfoCurrentProfileSavePathTextBox.Text = Path.Combine(profilePath, "save.jkr");
         }
         catch (Exception ex)
         {
             _logger.Log($"Error updating derived paths: {ex.Message}");
         }
-    }
-
-    private void LoadBalatroSettingsButton_Click(object sender, RoutedEventArgs e)
+    }private void LoadBalatroSettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        var filePath = BalatroSettingsFilePathTextBox.Text;
+        var filePath = InfoBalatroSettingsFilePathTextBox.Text;
         if (File.Exists(filePath))
         {
             LoadFile(filePath);
@@ -350,7 +348,7 @@ public partial class MainWindow : Window
 
     private void LoadProfileSettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        var filePath = CurrentProfileSettingsPathTextBox.Text;
+        var filePath = InfoCurrentProfileSettingsPathTextBox.Text;
         if (File.Exists(filePath))
         {
             LoadFile(filePath);
@@ -364,7 +362,7 @@ public partial class MainWindow : Window
 
     private void LoadProfileMetaButton_Click(object sender, RoutedEventArgs e)
     {
-        var filePath = CurrentProfileMetaPathTextBox.Text;
+        var filePath = InfoCurrentProfileMetaPathTextBox.Text;
         if (File.Exists(filePath))
         {
             LoadFile(filePath);
@@ -378,7 +376,7 @@ public partial class MainWindow : Window
 
     private void LoadProfileSaveButton_Click(object sender, RoutedEventArgs e)
     {
-        var filePath = CurrentProfileSavePathTextBox.Text;
+        var filePath = InfoCurrentProfileSavePathTextBox.Text;
         if (File.Exists(filePath))
         {
             LoadFile(filePath);
