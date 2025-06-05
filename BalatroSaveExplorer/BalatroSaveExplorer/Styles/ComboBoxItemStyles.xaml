@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- ComboBoxItem Style -->
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Background"
+                Value="{DynamicResource ComboBoxDropDownBrush}"/>
+        <Setter Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Padding"
+                Value="4"/>
+        <Style.Triggers>
+            <Trigger Property="IsHighlighted"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="{DynamicResource SelectionBackgroundBrush}"/>
+                <Setter Property="Foreground"
+                        Value="{DynamicResource SelectionTextBrush}"/>
+            </Trigger>
+            <Trigger Property="IsSelected"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="{DynamicResource SelectionBackgroundBrush}"/>
+                <Setter Property="Foreground"
+                        Value="{DynamicResource SelectionTextBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>

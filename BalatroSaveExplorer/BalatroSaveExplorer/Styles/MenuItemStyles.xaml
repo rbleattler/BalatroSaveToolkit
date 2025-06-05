@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="MenuItem">
+        <Setter Property="Background"
+                Value="{DynamicResource MenuBackgroundBrush}"/>
+        <Setter Property="Foreground"
+                Value="{DynamicResource PrimaryTextBrush}"/>
+        <Style.Triggers>
+            <Trigger Property="IsHighlighted"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="{DynamicResource MenuHoverBrush}"/>
+            </Trigger>
+            <Trigger Property="IsSubmenuOpen"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="{DynamicResource MenuHoverBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>
+
