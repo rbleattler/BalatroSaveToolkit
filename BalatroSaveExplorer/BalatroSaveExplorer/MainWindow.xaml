@@ -5,38 +5,62 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BalatroSaveExplorer"
         mc:Ignorable="d"
-        Title="Balatro JKR File Viewer" Height="800" Width="800">
-    <DockPanel>        <!-- Top toolbar -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" Height="40">
-            <Button x:Name="LoadFileButton" Content="Load JKR File" Width="120" Height="30"
-                    Click="LoadFileButton_Click" Margin="0,0,10,0" />
-            <Button x:Name="SaveAsLuaButton" Content="Save as Lua" Width="120" Height="30"
-                    Click="SaveAsLuaButton_Click" Margin="0,0,10,0" IsEnabled="False" />
-            <CheckBox x:Name="ShowLogsCheckBox" Content="Show Debug/Logs Panel"
-                      VerticalAlignment="Center" Checked="ShowLogsCheckBox_Checked"
-                      Unchecked="ShowLogsCheckBox_Unchecked" Margin="0,0,10,0" />
+        Title="Balatro JKR File Viewer"
+        Height="800"
+        Width="800">
+    <DockPanel>
+        <!-- Top toolbar -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Margin="10"
+                    Height="40">            <Button x:Name="LoadFileButton"
+                    Content="Load JKR File"
+                    Width="120"
+                    Height="30"
+                    Click="LoadFileButton_Click"
+                    Margin="0,0,10,0"/>
+            <Button x:Name="SaveAsLuaButton"
+                    Content="Save as Lua"
+                    Width="120"
+                    Height="30"
+                    Click="SaveAsLuaButton_Click"
+                    Margin="0,0,10,0"
+                    IsEnabled="False"/>
         </StackPanel>
-
         <!-- Bottom status bar -->
-        <StatusBar DockPanel.Dock="Bottom" Height="25" Background="LightGray" Width="Auto">
-            <StatusBarItem Width="Auto" HorizontalAlignment="Left">
-                <Label x:Name="StatusLabel" Content="Ready" Margin="0" Padding="5,2"
-                       VerticalAlignment="Center" Foreground="DarkBlue" />
+        <StatusBar DockPanel.Dock="Bottom"
+                   Height="25"
+                   Width="Auto">
+            <StatusBarItem Width="Auto"
+                           HorizontalAlignment="Left">
+                <Label x:Name="StatusLabel"
+                       Content="Ready"
+                       Margin="0"
+                       Padding="5,2"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource AccentTextBrush}"/>
             </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right" Width="Auto">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <StatusBarItem HorizontalAlignment="Right"
+                           Width="Auto">
+                <StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Center">
                     <Ellipse x:Name="WatchingIndicator"
-                             Width="8" Height="8"
-                             Fill="Gray" Margin="0,0,5,0"
+                             Width="8"
+                             Height="8"
+                             Fill="Gray"
+                             Margin="0,0,5,0"
                              HorizontalAlignment="Left"
                              VerticalAlignment="Center"
-                             Visibility="Collapsed" />
+                             Visibility="Collapsed"/>
                     <Label x:Name="LastUpdateLabel"
-                           Content="" FontSize="10" Margin="0" Padding="2"
-                           Foreground="DarkGray"
+                           Content=""
+                           FontSize="10"
+                           Margin="0"
+                           Padding="2"
+                           Foreground="{DynamicResource SecondaryTextBrush}"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Center"
-                           Visibility="Collapsed" />
+                           Visibility="Collapsed"/>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
@@ -44,102 +68,139 @@
         <!-- Main content area with tabs -->
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition x:Name="LogPanelRow" Height="0" />
+                <RowDefinition Height="*"/>
+                <RowDefinition x:Name="LogPanelRow"
+                               Height="0"/>
             </Grid.RowDefinitions>
 
             <!-- Main TabControl -->
-            <TabControl x:Name="MainTabControl" Grid.Row="0" Margin="10,0,10,10">
+            <TabControl x:Name="MainTabControl"
+                        Grid.Row="0"
+                        Margin="10,0,10,10">
                 <!-- Tree View Tab -->
 
-                <TabItem Header="Tree View" x:Name="TreeViewTab">
-                    <TreeView x:Name="DataTreeView" Margin="5">
+                <TabItem Header="Tree View"
+                         x:Name="TreeViewTab">
+                    <TreeView x:Name="DataTreeView"
+                              Margin="5">
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" Margin="0,0,5,0" />
-                                    <TextBlock Text="{Binding ValueDisplay}" Foreground="DarkGreen" />
+                                    <TextBlock Text="{Binding DisplayName}"
+                                               FontWeight="Bold"
+                                               Margin="0,0,5,0"/>
+                                    <TextBlock Text="{Binding ValueDisplay}"
+                                               Foreground="{DynamicResource SuccessTextBrush}"/>
                                 </StackPanel>
                             </HierarchicalDataTemplate>
                         </TreeView.ItemTemplate>
                     </TreeView>
-                </TabItem>                <!-- Info Tab -->
-                <TabItem Header="Info" x:Name="InfoTab">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5">
+                </TabItem>
+                <!-- Info Tab -->
+                <TabItem Header="Info"
+                         x:Name="InfoTab">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  Margin="5">
                         <StackPanel Margin="10">
-                            <GroupBox Header="Balatro Integration" Margin="0,0,0,15">
+                            <GroupBox Header="Balatro Integration"
+                                      Margin="0,0,0,15">
                                 <StackPanel Margin="10">
-                                    <Label Content="Balatro Save Root Directory:" />
+                                    <Label Content="Balatro Save Root Directory:"/>
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBox x:Name="InfoBalatroSaveRootTextBox" Grid.Column="0"
-                                                 VerticalAlignment="Center" Margin="0,0,5,0" IsReadOnly="True"
-                                                 Background="LightGray" />
+                                        <TextBox x:Name="InfoBalatroSaveRootTextBox"
+                                                 Grid.Column="0"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,5,0"
+                                                 IsReadOnly="True"/>
                                     </Grid>
-                                    <Separator Margin="0,5,0,10" />
-                                    <Label Content="Derived Paths:" FontWeight="Bold" />
+                                    <Separator Margin="0,5,0,10"/>
+                                    <Label Content="Derived Paths:"
+                                           FontWeight="Bold"/>
 
-                                    <Label Content="Settings File:" Margin="0,5,0,0" />
+                                    <Label Content="Settings File:"
+                                           Margin="0,5,0,0"/>
                                     <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBox x:Name="InfoBalatroSettingsFilePathTextBox" Grid.Column="0"
+                                        <TextBox x:Name="InfoBalatroSettingsFilePathTextBox"
+                                                 Grid.Column="0"
                                                  IsReadOnly="True"
-                                                 Background="LightGray" Margin="0,0,5,0" />
-                                        <Button x:Name="InfoLoadBalatroSettingsButton" Grid.Column="1"
-                                                Content="Load" Width="50" Height="25"
-                                                Click="LoadBalatroSettingsButton_Click" />
+                                                 Margin="0,0,5,0"/>
+                                        <Button x:Name="InfoLoadBalatroSettingsButton"
+                                                Grid.Column="1"
+                                                Content="Load"
+                                                Width="50"
+                                                Height="25"
+                                                Click="LoadBalatroSettingsButton_Click"/>
                                     </Grid>
 
-                                    <Label Content="Current Profile:" Margin="0,5,0,0" />
-                                    <TextBox x:Name="InfoCurrentProfileNumberTextBox" IsReadOnly="True"
-                                             Background="LightGray" Margin="0,0,0,5" />
+                                    <Label Content="Current Profile:"
+                                           Margin="0,5,0,0"/>
+                                    <TextBox x:Name="InfoCurrentProfileNumberTextBox"
+                                             IsReadOnly="True"
+                                             Margin="0,0,0,5"/>
 
-                                    <Label Content="Profile Settings:" Margin="0,5,0,0" />
+                                    <Label Content="Profile Settings:"
+                                           Margin="0,5,0,0"/>
                                     <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBox x:Name="InfoCurrentProfileSettingsPathTextBox" Grid.Column="0"
+                                        <TextBox x:Name="InfoCurrentProfileSettingsPathTextBox"
+                                                 Grid.Column="0"
                                                  IsReadOnly="True"
-                                                 Background="LightGray" Margin="0,0,5,0" />
-                                        <Button x:Name="InfoLoadProfileSettingsButton" Grid.Column="1"
-                                                Content="Load" Width="50" Height="25"
-                                                Click="LoadProfileSettingsButton_Click" />
+                                                 Margin="0,0,5,0"/>
+                                        <Button x:Name="InfoLoadProfileSettingsButton"
+                                                Grid.Column="1"
+                                                Content="Load"
+                                                Width="50"
+                                                Height="25"
+                                                Click="LoadProfileSettingsButton_Click"/>
                                     </Grid>
 
-                                    <Label Content="Profile Meta:" Margin="0,5,0,0" />
+                                    <Label Content="Profile Meta:"
+                                           Margin="0,5,0,0"/>
                                     <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBox x:Name="InfoCurrentProfileMetaPathTextBox" Grid.Column="0"
+                                        <TextBox x:Name="InfoCurrentProfileMetaPathTextBox"
+                                                 Grid.Column="0"
                                                  IsReadOnly="True"
-                                                 Background="LightGray" Margin="0,0,5,0" />
-                                        <Button x:Name="InfoLoadProfileMetaButton" Grid.Column="1"
-                                                Content="Load" Width="50" Height="25"
-                                                Click="LoadProfileMetaButton_Click" />
+                                                 Margin="0,0,5,0"/>
+                                        <Button x:Name="InfoLoadProfileMetaButton"
+                                                Grid.Column="1"
+                                                Content="Load"
+                                                Width="50"
+                                                Height="25"
+                                                Click="LoadProfileMetaButton_Click"/>
                                     </Grid>
 
-                                    <Label Content="Profile Save:" Margin="0,5,0,0" />
+                                    <Label Content="Profile Save:"
+                                           Margin="0,5,0,0"/>
                                     <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBox x:Name="InfoCurrentProfileSavePathTextBox" Grid.Column="0"
+                                        <TextBox x:Name="InfoCurrentProfileSavePathTextBox"
+                                                 Grid.Column="0"
                                                  IsReadOnly="True"
-                                                 Background="LightGray" Margin="0,0,5,0" />
-                                        <Button x:Name="InfoLoadProfileSaveButton" Grid.Column="1"
-                                                Content="Load" Width="50" Height="25"
-                                                Click="LoadProfileSaveButton_Click" />
+                                                 Margin="0,0,5,0"/>
+                                        <Button x:Name="InfoLoadProfileSaveButton"
+                                                Grid.Column="1"
+                                                Content="Load"
+                                                Width="50"
+                                                Height="25"
+                                                Click="LoadProfileSaveButton_Click"/>
                                     </Grid>
                                 </StackPanel>
                             </GroupBox>
@@ -148,114 +209,167 @@
                 </TabItem>
 
                 <!-- Settings Tab -->
-                <TabItem Header="Settings" x:Name="SettingsTab">
+                <TabItem Header="Settings"
+                         x:Name="SettingsTab">
                     <Grid Margin="5">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <!-- Settings sub-tabs -->
-                        <TabControl Grid.Row="0" x:Name="SettingsTabControl">
+                        <TabControl Grid.Row="0"
+                                    x:Name="SettingsTabControl">
                             <!-- General Settings Sub-tab -->
                             <TabItem Header="General">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                                     <StackPanel Margin="10">
-                                        <GroupBox Header="Default Directories" Margin="0,0,0,15">
+                                        <GroupBox Header="Appearance"
+                                                  Margin="0,0,0,15">
                                             <StackPanel Margin="10">
-                                                <Label Content="Default JKR Directory:" />
+                                                <Label Content="Theme:"/>
+                                                <ComboBox x:Name="ThemeComboBox"
+                                                          Width="200"
+                                                          HorizontalAlignment="Left"
+                                                          Margin="0,5,0,10"
+                                                          SelectionChanged="ThemeComboBox_SelectionChanged"
+                                                          SelectedValue="Dark">
+                                                    <ComboBoxItem Content="Follow System"
+                                                                  Tag="System"/>
+                                                    <ComboBoxItem Content="Light"
+                                                                  Tag="Light"/>
+                                                    <ComboBoxItem Content="Dark"
+                                                                  Tag="Dark"/>
+                                                </ComboBox>
+                                                <TextBlock Text="Changes take effect immediately"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                                           Margin="0,0,0,0"/>
+                                            </StackPanel>
+                                        </GroupBox>
+
+                                        <GroupBox Header="Default Directories"
+                                                  Margin="0,0,0,15">
+                                            <StackPanel Margin="10">
+                                                <Label Content="Default JKR Directory:"/>
                                                 <Grid Margin="0,0,0,10">
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBox x:Name="DefaultJkrDirectoryTextBox" Grid.Column="0"
-                                                             VerticalAlignment="Center" Margin="0,0,5,0" />
-                                                    <Button x:Name="BrowseJkrDirectoryButton" Grid.Column="1"
-                                                            Content="Browse..." Width="80" Height="25"
-                                                            Click="BrowseJkrDirectoryButton_Click" />
+                                                    <TextBox x:Name="DefaultJkrDirectoryTextBox"
+                                                             Grid.Column="0"
+                                                             VerticalAlignment="Center"
+                                                             Margin="0,0,5,0"/>
+                                                    <Button x:Name="BrowseJkrDirectoryButton"
+                                                            Grid.Column="1"
+                                                            Content="Browse..."
+                                                            Width="80"
+                                                            Height="25"
+                                                            Click="BrowseJkrDirectoryButton_Click"/>
                                                 </Grid>
 
-                                                <Label Content="Default Lua Export Directory:" />
+                                                <Label Content="Default Lua Export Directory:"/>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBox x:Name="DefaultLuaExportDirectoryTextBox" Grid.Column="0"
-                                                             VerticalAlignment="Center" Margin="0,0,5,0" />
-                                                    <Button x:Name="BrowseLuaExportDirectoryButton" Grid.Column="1"
-                                                            Content="Browse..." Width="80" Height="25"
-                                                            Click="BrowseLuaExportDirectoryButton_Click" />
+                                                    <TextBox x:Name="DefaultLuaExportDirectoryTextBox"
+                                                             Grid.Column="0"
+                                                             VerticalAlignment="Center"
+                                                             Margin="0,0,5,0"/>
+                                                    <Button x:Name="BrowseLuaExportDirectoryButton"
+                                                            Grid.Column="1"
+                                                            Content="Browse..."
+                                                            Width="80"
+                                                            Height="25"
+                                                            Click="BrowseLuaExportDirectoryButton_Click"/>
                                                 </Grid>
                                             </StackPanel>
                                         </GroupBox>
 
-                                        <GroupBox Header="File Operations" Margin="0,0,0,15">
+                                        <GroupBox Header="File Operations"
+                                                  Margin="0,0,0,15">
                                             <StackPanel Margin="10">
                                                 <CheckBox x:Name="AutoSaveDecompressedFilesCheckBox"
                                                           Content="Automatically save decompressed files to temp"
-                                                          Margin="0,0,0,5" />
+                                                          Margin="0,0,0,5"/>
                                                 <CheckBox x:Name="ConfirmFileOverwritesCheckBox"
                                                           Content="Confirm before overwriting existing files"
-                                                          Margin="0,0,0,5" />
+                                                          Margin="0,0,0,5"/>
                                                 <CheckBox x:Name="EnableAutoBackupCheckBox"
-                                                          Content="Enable automatic backup of JKR files before processing" />
+                                                          Content="Enable automatic backup of JKR files before processing"/>
                                             </StackPanel>
                                         </GroupBox>
 
-                                        <GroupBox Header="File Watching" Margin="0,0,0,15">
+                                        <GroupBox Header="File Watching"
+                                                  Margin="0,0,0,15">
                                             <StackPanel Margin="10">
                                                 <CheckBox x:Name="EnableFileWatchingCheckBox"
                                                           Content="Enable file watching for derived Balatro files"
-                                                          Margin="0,0,0,5" />
+                                                          Margin="0,0,0,5"/>
                                                 <CheckBox x:Name="FlashTaskbarOnUpdateCheckBox"
                                                           Content="Flash taskbar when watched files are updated"
-                                                          Margin="0,0,0,5" />
+                                                          Margin="0,0,0,5"/>
                                                 <CheckBox x:Name="AutoRefreshOnFileChangeCheckBox"
-                                                          Content="Automatically refresh view when watched files change" />
+                                                          Content="Automatically refresh view when watched files change"/>
                                             </StackPanel>
                                         </GroupBox>
 
-                                        <GroupBox Header="Backup Settings" Margin="0,0,0,15">
+                                        <GroupBox Header="Backup Settings"
+                                                  Margin="0,0,0,15">
                                             <StackPanel Margin="10">
-                                                <Label Content="Backup Directory:" />
+                                                <Label Content="Backup Directory:"/>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBox x:Name="BackupDirectoryTextBox" Grid.Column="0"
-                                                             VerticalAlignment="Center" Margin="0,0,5,0" />
-                                                    <Button x:Name="BrowseBackupDirectoryButton" Grid.Column="1"
-                                                            Content="Browse..." Width="80" Height="25"
-                                                            Click="BrowseBackupDirectoryButton_Click" />
+                                                    <TextBox x:Name="BackupDirectoryTextBox"
+                                                             Grid.Column="0"
+                                                             VerticalAlignment="Center"
+                                                             Margin="0,0,5,0"/>
+                                                    <Button x:Name="BrowseBackupDirectoryButton"
+                                                            Grid.Column="1"
+                                                            Content="Browse..."
+                                                            Width="80"
+                                                            Height="25"
+                                                            Click="BrowseBackupDirectoryButton_Click"/>
                                                 </Grid>
                                             </StackPanel>
                                         </GroupBox>
                                     </StackPanel>
                                 </ScrollViewer>
-                            </TabItem>                            <!-- Profile Manager Sub-tab -->
+                            </TabItem>
+                            <!-- Profile Manager Sub-tab -->
                             <TabItem Header="Profile Manager">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                                     <StackPanel Margin="10">
-                                        <GroupBox Header="Balatro Save Root Configuration" Margin="0,0,0,15">
+                                        <GroupBox Header="Balatro Save Root Configuration"
+                                                  Margin="0,0,0,15">
                                             <StackPanel Margin="10">
-                                                <Label Content="Balatro Save Root Directory:" />
+                                                <Label Content="Balatro Save Root Directory:"/>
                                                 <Grid Margin="0,0,0,10">
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBox x:Name="BalatroSaveRootTextBox" Grid.Column="0"
-                                                             VerticalAlignment="Center" Margin="0,0,5,0"
-                                                             TextChanged="BalatroSaveRootTextBox_TextChanged" />
-                                                    <Button x:Name="BrowseBalatroSaveRootButton" Grid.Column="1"
-                                                            Content="Browse..." Width="80" Height="25"
-                                                            Click="BrowseBalatroSaveRootButton_Click" />
+                                                    <TextBox x:Name="BalatroSaveRootTextBox"
+                                                             Grid.Column="0"
+                                                             VerticalAlignment="Center"
+                                                             Margin="0,0,5,0"
+                                                             TextChanged="BalatroSaveRootTextBox_TextChanged"/>
+                                                    <Button x:Name="BrowseBalatroSaveRootButton"
+                                                            Grid.Column="1"
+                                                            Content="Browse..."
+                                                            Width="80"
+                                                            Height="25"
+                                                            Click="BrowseBalatroSaveRootButton_Click"/>
                                                 </Grid>
-                                                <TextBlock TextWrapping="Wrap" Margin="0,5,0,0"
-                                                           Foreground="DarkSlateGray">
+                                                <TextBlock TextWrapping="Wrap"
+                                                           Margin="0,5,0,0"
+                                                           Foreground="{DynamicResource SecondaryTextBrush}">
                                                     Set the root directory where Balatro saves are stored. Once configured,
                                                     derived file paths will be displayed in the Info tab for easy access.
                                                 </TextBlock>
@@ -282,9 +396,8 @@
                                                     <Button x:Name="BrowseBalatroSaveRootButton" Grid.Column="1"
                                                             Content="Browse..." Width="80" Height="25"
                                                             Click="BrowseBalatroSaveRootButton_Click" />
-                                                </Grid>
-                                                <TextBlock TextWrapping="Wrap" Margin="0,5,0,0"
-                                                           Foreground="DarkSlateGray">
+                                                </Grid>                                                <TextBlock TextWrapping="Wrap" Margin="0,5,0,0"
+                                                           Foreground="{DynamicResource SecondaryTextBrush}">
                                                     Set the root directory where Balatro saves are stored. Once configured,
                                                     derived file paths will be displayed in the Info tab for easy access.
                                                 </TextBlock>
@@ -297,23 +410,32 @@
                             <!-- Logging Sub-tab -->
                             <TabItem Header="Logging">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                    <StackPanel Margin="10">
-                                        <GroupBox Header="Log Display" Margin="0,0,0,15">
+                                    <StackPanel Margin="10">                                        <GroupBox Header="Log Display"
+                                                  Margin="0,0,0,15">
                                             <StackPanel Margin="10">
+                                                <CheckBox x:Name="ShowLogsCheckBox"
+                                                          Content="Show Debug/Logs Panel"
+                                                          VerticalAlignment="Center"
+                                                          Checked="ShowLogsCheckBox_Checked"
+                                                          Unchecked="ShowLogsCheckBox_Unchecked"
+                                                          Margin="0,0,0,10"
+                                                          Foreground="{DynamicResource PrimaryTextBrush}"/>
                                                 <CheckBox x:Name="ShowLogsOnStartupCheckBox"
                                                           Content="Show logs panel on application startup"
-                                                          Margin="0,0,0,10" />
+                                                          Margin="0,0,0,10"/>
 
-                                                <Label Content="Log Level:" />
-                                                <ComboBox x:Name="LogLevelComboBox" Margin="0,0,0,10">
-                                                    <ComboBoxItem Content="Debug" />
-                                                    <ComboBoxItem Content="Info" />
-                                                    <ComboBoxItem Content="Warning" />
-                                                    <ComboBoxItem Content="Error" />
+                                                <Label Content="Log Level:"/>
+                                                <ComboBox x:Name="LogLevelComboBox"
+                                                          Margin="0,0,0,10">
+                                                    <ComboBoxItem Content="Debug"/>
+                                                    <ComboBoxItem Content="Info"/>
+                                                    <ComboBoxItem Content="Warning"/>
+                                                    <ComboBoxItem Content="Error"/>
                                                 </ComboBox>
 
-                                                <Label Content="Maximum Log Entries:" />
-                                                <TextBox x:Name="MaxLogEntriesTextBox" Margin="0,0,0,10" />
+                                                <Label Content="Maximum Log Entries:"/>
+                                                <TextBox x:Name="MaxLogEntriesTextBox"
+                                                         Margin="0,0,0,10"/>
                                             </StackPanel>
                                         </GroupBox>
                                     </StackPanel>
@@ -324,24 +446,32 @@
                             <TabItem Header="About">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                                     <StackPanel Margin="10">
-                                        <GroupBox Header="Application Information" Margin="0,0,0,15">
+                                        <GroupBox Header="Application Information"
+                                                  Margin="0,0,0,15">
                                             <StackPanel Margin="10">
-                                                <TextBlock Text="Balatro Save Explorer" FontSize="16" FontWeight="Bold"
-                                                           Margin="0,0,0,5" />
-                                                <TextBlock Text="Version 1.0.0" Margin="0,0,0,5" />
+                                                <TextBlock Text="Balatro Save Explorer"
+                                                           FontSize="16"
+                                                           FontWeight="Bold"
+                                                           Margin="0,0,0,5"/>
+                                                <TextBlock Text="Version 1.0.0"
+                                                           Margin="0,0,0,5"/>
                                                 <TextBlock
                                                     Text="A tool for viewing and editing Balatro save files (.jkr)"
-                                                    TextWrapping="Wrap" Margin="0,0,0,10" />
+                                                    TextWrapping="Wrap"
+                                                    Margin="0,0,0,10"/>
 
-                                                <TextBlock Text="Settings File Location:" FontWeight="Bold"
-                                                           Margin="0,5,0,2" />
-                                                <TextBox x:Name="SettingsFilePathTextBox" IsReadOnly="True"
-                                                         Background="LightGray" Margin="0,0,0,10" />
+                                                <TextBlock Text="Settings File Location:"
+                                                           FontWeight="Bold"
+                                                           Margin="0,5,0,2"/>
+                                                <TextBox x:Name="SettingsFilePathTextBox"
+                                                         IsReadOnly="True"
+                                                         Margin="0,0,0,10"/>
 
                                                 <Button x:Name="OpenSettingsFolderButton"
                                                         Content="Open Settings Folder"
-                                                        Width="150" HorizontalAlignment="Left"
-                                                        Click="OpenSettingsFolderButton_Click" />
+                                                        Width="150"
+                                                        HorizontalAlignment="Left"
+                                                        Click="OpenSettingsFolderButton_Click"/>
                                             </StackPanel>
                                         </GroupBox>
                                     </StackPanel>
@@ -350,101 +480,172 @@
                         </TabControl>
 
                         <!-- Settings action buttons -->
-                        <StackPanel Grid.Row="1" Orientation="Horizontal"
-                                    HorizontalAlignment="Right" Margin="0,10,0,0">
-                            <Button x:Name="ResetToDefaultsButton" Content="Reset to Defaults"
-                                    Width="120" Height="30" Margin="0,0,10,0"
-                                    Click="ResetToDefaultsButton_Click" />
-                            <Button x:Name="ApplySettingsButton" Content="Apply"
-                                    Width="80" Height="30" Margin="0,0,10,0"
-                                    Click="ApplySettingsButton_Click" />
+                        <StackPanel Grid.Row="1"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,10,0,0">
+                            <Button x:Name="ResetToDefaultsButton"
+                                    Content="Reset to Defaults"
+                                    Width="120"
+                                    Height="30"
+                                    Margin="0,0,10,0"
+                                    Click="ResetToDefaultsButton_Click"/>
+                            <Button x:Name="ApplySettingsButton"
+                                    Content="Apply"
+                                    Width="80"
+                                    Height="30"
+                                    Margin="0,0,10,0"
+                                    Click="ApplySettingsButton_Click"/>
                         </StackPanel>
                     </Grid>
-                </TabItem>                <!-- File Info Tab -->
-                <TabItem Header="File Info" x:Name="FileInfoTab">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5">
+                </TabItem>
+                <!-- File Info Tab -->
+                <TabItem Header="File Info"
+                         x:Name="FileInfoTab">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  Margin="5">
                         <StackPanel Margin="10">
-                            <GroupBox Header="File Information" Margin="0,0,0,15">
+                            <GroupBox Header="File Information"
+                                      Margin="0,0,0,15">
                                 <Grid Margin="10">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <Label Grid.Row="0" Grid.Column="0" Content="File Path:" FontWeight="Bold" />
-                                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="FilePathTextBox" IsReadOnly="True"
-                                             Background="LightGray" Margin="5,0,0,5" />
-
-                                    <Label Grid.Row="1" Grid.Column="0" Content="File Size:" FontWeight="Bold" />
-                                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="FileSizeTextBox" IsReadOnly="True"
-                                             Background="LightGray" Margin="5,0,0,5" />
-
-                                    <Label Grid.Row="2" Grid.Column="0" Content="Last Modified:" FontWeight="Bold" />
-                                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="LastModifiedTextBox"
+                                    <Label Grid.Row="0"
+                                           Grid.Column="0"
+                                           Content="File Path:"
+                                           FontWeight="Bold"/>
+                                    <TextBox Grid.Row="0"
+                                             Grid.Column="1"
+                                             x:Name="FilePathTextBox"
                                              IsReadOnly="True"
-                                             Background="LightGray" Margin="5,0,0,5" />
+                                             Margin="5,0,0,5"/>
 
-                                    <Label Grid.Row="3" Grid.Column="0" Content="Compression:" FontWeight="Bold" />
-                                    <TextBox Grid.Row="3" Grid.Column="1" x:Name="CompressionInfoTextBox"
+                                    <Label Grid.Row="1"
+                                           Grid.Column="0"
+                                           Content="File Size:"
+                                           FontWeight="Bold"/>
+                                    <TextBox Grid.Row="1"
+                                             Grid.Column="1"
+                                             x:Name="FileSizeTextBox"
                                              IsReadOnly="True"
-                                             Background="LightGray" Margin="5,0,0,5" />
+                                             Margin="5,0,0,5"/>
 
-                                    <Label Grid.Row="4" Grid.Column="0" Content="Content Type:" FontWeight="Bold" />
-                                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="ContentTypeTextBox" IsReadOnly="True"
-                                             Background="LightGray" Margin="5,0,0,5" />
-
-                                    <Label Grid.Row="5" Grid.Column="0" Content="Entries Count:" FontWeight="Bold" />
-                                    <TextBox Grid.Row="5" Grid.Column="1" x:Name="EntriesCountTextBox"
+                                    <Label Grid.Row="2"
+                                           Grid.Column="0"
+                                           Content="Last Modified:"
+                                           FontWeight="Bold"/>
+                                    <TextBox Grid.Row="2"
+                                             Grid.Column="1"
+                                             x:Name="LastModifiedTextBox"
                                              IsReadOnly="True"
-                                             Background="LightGray" Margin="5,0,0,5" />
+                                             Margin="5,0,0,5"/>
+
+                                    <Label Grid.Row="3"
+                                           Grid.Column="0"
+                                           Content="Compression:"
+                                           FontWeight="Bold"/>
+                                    <TextBox Grid.Row="3"
+                                             Grid.Column="1"
+                                             x:Name="CompressionInfoTextBox"
+                                             IsReadOnly="True"
+                                             Margin="5,0,0,5"/>
+
+                                    <Label Grid.Row="4"
+                                           Grid.Column="0"
+                                           Content="Content Type:"
+                                           FontWeight="Bold"/>
+                                    <TextBox Grid.Row="4"
+                                             Grid.Column="1"
+                                             x:Name="ContentTypeTextBox"
+                                             IsReadOnly="True"
+                                             Margin="5,0,0,5"/>
+
+                                    <Label Grid.Row="5"
+                                           Grid.Column="0"
+                                           Content="Entries Count:"
+                                           FontWeight="Bold"/>
+                                    <TextBox Grid.Row="5"
+                                             Grid.Column="1"
+                                             x:Name="EntriesCountTextBox"
+                                             IsReadOnly="True"
+                                             Margin="5,0,0,5"/>
                                 </Grid>
                             </GroupBox>
 
-                            <GroupBox Header="Raw Content" Margin="0,0,0,15">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                                              Margin="5" Height="300">
-                                    <TextBox x:Name="RawContentTextBox" IsReadOnly="True"
-                                             TextWrapping="NoWrap" FontFamily="Consolas" FontSize="12"
-                                             Background="White" BorderThickness="0" />
+                            <GroupBox Header="Raw Content"
+                                      Margin="0,0,0,15">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              Margin="5"
+                                              Height="300">
+                                    <TextBox x:Name="RawContentTextBox"
+                                             IsReadOnly="True"
+                                             TextWrapping="NoWrap"
+                                             FontFamily="Consolas"
+                                             FontSize="12"
+                                             Background="{DynamicResource TextBoxBackgroundBrush}"
+                                             Foreground="{DynamicResource PrimaryTextBrush}"
+                                             BorderThickness="0"/>
                                 </ScrollViewer>
                             </GroupBox>
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
-                <TabItem Header="Saves" x:Name="SaveViewTab">
+                <TabItem Header="Saves"
+                         x:Name="SaveViewTab">
                 </TabItem>
             </TabControl>
-
             <!-- External log panel (initially hidden) -->
-            <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1,1,1,0"
-                    Background="LightGray" Margin="10,0,10,10">
+            <Border Grid.Row="1"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1,1,1,0"
+                    Background="{DynamicResource LogPanelBackgroundBrush}"
+                    Margin="10,0,10,10">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Background="DarkGray"
-                                Height="25" Margin="0">
-                        <Label Content="Debug/Logs" Foreground="White" FontWeight="Bold"
-                               VerticalAlignment="Center" Margin="5,0" />
-                        <Button x:Name="ClearLogsButton" Content="Clear" Width="50" Height="20"
-                                Margin="10,0" Click="ClearLogsButton_Click" />
+                    <StackPanel Grid.Row="0"
+                                Orientation="Horizontal"
+                                Height="25"
+                                Background="{DynamicResource LogPanelHeaderBrush}"
+                                Margin="0">
+                        <Label Content="Debug/Logs"
+                               Foreground="{DynamicResource InvertedTextBrush}"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               Margin="5,0"/>
+                        <Button x:Name="ClearLogsButton"
+                                Content="Clear"
+                                Width="50"
+                                Height="20"
+                                Margin="10,0"
+                                Click="ClearLogsButton_Click"/>
                     </StackPanel>
 
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Auto">
-                        <TextBox x:Name="LogTextBox" Background="White" IsReadOnly="True"
-                                 TextWrapping="Wrap" BorderThickness="0"
-                                 VerticalAlignment="Stretch" AcceptsReturn="True" />
+                        <TextBox x:Name="LogTextBox"
+                                 IsReadOnly="True"
+                                 TextWrapping="Wrap"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                 VerticalAlignment="Stretch"
+                                 AcceptsReturn="True"/>
                     </ScrollViewer>
                 </Grid>
             </Border>

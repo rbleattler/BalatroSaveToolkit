@@ -32,10 +32,10 @@ public partial class MainWindow : Window
     private DateTime _lastFileUpdate;
     private bool _isWatchingDerivedFile;
     private DispatcherTimer _flashTimer;
-    private int _flashCount;
+    private int _flashCount;    // Settings management fields
+    private AppSettings _workingSettings;
 
-    // Settings management fields
-    private AppSettings _workingSettings;    public MainWindow()
+    public MainWindow()
     {
         InitializeComponent();
 
@@ -75,7 +75,8 @@ public partial class MainWindow : Window
             ShowLogsCheckBox.IsChecked = true;
             LogPanelRow.Height = new GridLength(200);
         }
-    }    private void LoadFileButton_Click(object sender, RoutedEventArgs e)
+    }
+    private void LoadFileButton_Click(object sender, RoutedEventArgs e)
     {
         var settings = SettingsManager.Instance.Settings;
         var openFileDialog = new OpenFileDialog
@@ -83,14 +84,13 @@ public partial class MainWindow : Window
             Filter = "JKR Files (*.jkr)|*.jkr|All Files (*.*)|*.*",
             Title = "Select JKR File to Load",
             InitialDirectory = Directory.Exists(settings.DefaultJkrDirectory) ? settings.DefaultJkrDirectory : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-        };        if (openFileDialog.ShowDialog() == true)
+        }; if (openFileDialog.ShowDialog() == true)
         {
             LoadFile(openFileDialog.FileName);
-        }    }
+        }
+    }
 
-    #region Settings Management
-
-    /// <summary>
+    #region Settings Management    /// <summary>
     /// Creates a deep copy of the settings object
     /// </summary>
     private AppSettings CloneSettings(AppSettings original)
@@ -107,6 +107,7 @@ public partial class MainWindow : Window
             EnableAutoBackup = original.EnableAutoBackup,
             BackupDirectory = original.BackupDirectory,
             BalatroSaveRoot = original.BalatroSaveRoot,
+            Theme = original.Theme,
             EnableFileWatching = original.EnableFileWatching,
             FlashTaskbarOnUpdate = original.FlashTaskbarOnUpdate,
             AutoRefreshOnFileChange = original.AutoRefreshOnFileChange
@@ -131,14 +132,22 @@ public partial class MainWindow : Window
         // File watching settings
         EnableFileWatchingCheckBox.IsChecked = _workingSettings.EnableFileWatching;
         FlashTaskbarOnUpdateCheckBox.IsChecked = _workingSettings.FlashTaskbarOnUpdate;
-        AutoRefreshOnFileChangeCheckBox.IsChecked = _workingSettings.AutoRefreshOnFileChange;
-
-        // Set the log level combobox
+        AutoRefreshOnFileChangeCheckBox.IsChecked = _workingSettings.AutoRefreshOnFileChange;        // Set the log level combobox
         foreach (ComboBoxItem item in LogLevelComboBox.Items)
         {
             if (item.Content.ToString() == _workingSettings.LogLevel)
             {
                 LogLevelComboBox.SelectedItem = item;
+                break;
+            }
+        }
+
+        // Set the theme combobox
+        foreach (ComboBoxItem item in ThemeComboBox.Items)
+        {
+            if (item.Tag.ToString() == _workingSettings.Theme.ToString())
+            {
+                ThemeComboBox.SelectedItem = item;
                 break;
             }
         }
@@ -169,11 +178,18 @@ public partial class MainWindow : Window
         if (int.TryParse(MaxLogEntriesTextBox.Text, out int maxLogEntries))
         {
             _workingSettings.MaxLogEntries = maxLogEntries;
-        }
-
-        if (LogLevelComboBox.SelectedItem is ComboBoxItem selectedItem)
+        }        if (LogLevelComboBox.SelectedItem is ComboBoxItem selectedItem)
         {
             _workingSettings.LogLevel = selectedItem.Content.ToString() ?? "Info";
+        }
+
+        // Theme settings
+        if (ThemeComboBox.SelectedItem is ComboBoxItem selectedThemeItem)
+        {
+            if (Enum.TryParse<AppTheme>(selectedThemeItem.Tag.ToString(), out AppTheme theme))
+            {
+                _workingSettings.Theme = theme;
+            }
         }
     }
 
@@ -193,14 +209,18 @@ public partial class MainWindow : Window
         settings.MaxLogEntries = _workingSettings.MaxLogEntries;
         settings.EnableAutoBackup = _workingSettings.EnableAutoBackup;
         settings.BackupDirectory = _workingSettings.BackupDirectory;
-        settings.BalatroSaveRoot = _workingSettings.BalatroSaveRoot;
-
-        // File watching settings
+        settings.BalatroSaveRoot = _workingSettings.BalatroSaveRoot;        // File watching settings
         settings.EnableFileWatching = _workingSettings.EnableFileWatching;
         settings.FlashTaskbarOnUpdate = _workingSettings.FlashTaskbarOnUpdate;
         settings.AutoRefreshOnFileChange = _workingSettings.AutoRefreshOnFileChange;
 
+        // Theme settings
+        settings.Theme = _workingSettings.Theme;
+
         SettingsManager.Instance.SaveSettings();
+
+        // Apply theme immediately
+        ThemeManager.Instance.ApplyCurrentTheme();
     }
 
     private void BrowseJkrDirectoryButton_Click(object sender, RoutedEventArgs e)
@@ -293,12 +313,32 @@ public partial class MainWindow : Window
             LoadSettingsIntoControls();
             _logger.Log("Settings reset to defaults");
         }
-    }
-
-    private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    }    private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         UpdateBalatroDerivedPaths();
-    }    private void UpdateBalatroDerivedPaths()
+    }
+
+    private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        // Only apply theme change if the selection is from user interaction
+        // (not from programmatic loading)
+        if (ThemeComboBox.SelectedItem is ComboBoxItem selectedItem && IsLoaded)
+        {
+            if (Enum.TryParse<AppTheme>(selectedItem.Tag.ToString(), out AppTheme theme))
+            {
+                // Update working settings immediately
+                _workingSettings.Theme = theme;
+
+                // Apply theme immediately for instant feedback
+                var settings = SettingsManager.Instance.Settings;
+                settings.Theme = theme;
+                ThemeManager.Instance.ApplyCurrentTheme();
+
+                _logger.Log($"Theme changed to: {theme}");
+            }
+        }
+    }
+    private void UpdateBalatroDerivedPaths()
     {
         var saveRoot = BalatroSaveRootTextBox.Text;
 
@@ -332,7 +372,8 @@ public partial class MainWindow : Window
         {
             _logger.Log($"Error updating derived paths: {ex.Message}");
         }
-    }private void LoadBalatroSettingsButton_Click(object sender, RoutedEventArgs e)
+    }
+    private void LoadBalatroSettingsButton_Click(object sender, RoutedEventArgs e)
     {
         var filePath = InfoBalatroSettingsFilePathTextBox.Text;
         if (File.Exists(filePath))
@@ -533,7 +574,8 @@ public partial class MainWindow : Window
     {
         _logger.ClearLogs();
         LogTextBox.Text = "";
-    }    private void SaveAsLuaButton_Click(object sender, RoutedEventArgs e)
+    }
+    private void SaveAsLuaButton_Click(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrEmpty(_currentFilePath) || string.IsNullOrEmpty(_currentDecompressedContent))
         {
@@ -634,7 +676,8 @@ public partial class MainWindow : Window
             LogTextBox.AppendText(logMessage + Environment.NewLine);
             LogTextBox.ScrollToEnd();
         });
-    }    protected override void OnClosed(EventArgs e)
+    }
+    protected override void OnClosed(EventArgs e)
     {
         // Clean up file watching resources
         StopFileWatching();
@@ -718,7 +761,7 @@ public partial class MainWindow : Window
             var fileName = Path.GetFileNameWithoutExtension(originalFilePath);
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var tempFileName = $"{fileName}_decompressed_{timestamp}.lua";
-            var tempPath = Path.Combine(tempDir, tempFileName);            File.WriteAllText(tempPath, content, Encoding.UTF8);
+            var tempPath = Path.Combine(tempDir, tempFileName); File.WriteAllText(tempPath, content, Encoding.UTF8);
             _logger.Log($"Auto-saved decompressed content to: {tempPath}");
         }
         catch (Exception ex)

@@ -18,8 +18,10 @@ public class AppSettings : INotifyPropertyChanged
     private bool _confirmFileOverwrites = true;
     private string _logLevel = "Info"; private int _maxLogEntries = 1000;
     private bool _enableAutoBackup = true;
-    private string _backupDirectory = Path.Combine(_appDataDirectory, "BalatroBackups");
-    private string _balatroSaveRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Balatro");
+    private string _backupDirectory = Path.Combine(_appDataDirectory, "BalatroBackups");    private string _balatroSaveRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Balatro");
+
+    // Theme settings
+    private AppTheme _theme = AppTheme.System;
 
     // File watching settings
     private bool _enableFileWatching = true;
@@ -157,8 +159,16 @@ public class AppSettings : INotifyPropertyChanged
     /// </summary>
     public string CurrentProfileMetaPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "meta.jkr");    /// <summary>
                                                                                                                            /// Path to current profile's save file (derived)
-                                                                                                                           /// </summary>
-    public string CurrentProfileSavePath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "save.jkr");
+                                                                                                                           /// </summary>    public string CurrentProfileSavePath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "save.jkr");
+
+    /// <summary>
+    /// Application theme setting
+    /// </summary>
+    public AppTheme Theme
+    {
+        get => _theme;
+        set => SetProperty(ref _theme, value);
+    }
 
     /// <summary>
     /// Whether to enable file watching for derived JKR files
