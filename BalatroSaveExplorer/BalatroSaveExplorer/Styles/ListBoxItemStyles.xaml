@@ -6,6 +6,10 @@
                 Value="{DynamicResource PrimaryTextBrush}"/>
         <Setter Property="Padding"
                 Value="4"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment"
+                Value="Stretch"/>
         <Style.Triggers>
             <Trigger Property="IsSelected"
                      Value="True">

@@ -4,6 +4,8 @@
     <Style TargetType="Grid">
         <Setter Property="Background"
                 Value="{DynamicResource WindowBackgroundBrush}"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
     </Style>
 
 </ResourceDictionary>

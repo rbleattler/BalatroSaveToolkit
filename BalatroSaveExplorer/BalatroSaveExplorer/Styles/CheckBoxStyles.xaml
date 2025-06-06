@@ -16,6 +16,8 @@
                 Value="Left"/>
         <Setter Property="Padding"
                 Value="4,0,0,0"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">

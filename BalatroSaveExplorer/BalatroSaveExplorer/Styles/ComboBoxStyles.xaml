@@ -4,7 +4,7 @@
 
     <!-- Simple ToggleButton for the drop-down arrow -->
     <Style x:Key="ComboBoxToggleButton"
-            TargetType="ToggleButton">
+           TargetType="ToggleButton">
         <Setter Property="OverridesDefaultStyle"
                 Value="True"/>
         <Setter Property="Background"
@@ -28,7 +28,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled"
-                                Value="False">
+                                 Value="False">
                             <Setter TargetName="Border"
                                     Property="Background"
                                     Value="{DynamicResource ButtonDisabledBrush}"/>
@@ -36,7 +36,7 @@
                                     Value="{DynamicResource DisabledTextBrush}"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver"
-                                Value="True">
+                                 Value="True">
                             <Setter TargetName="Border"
                                     Property="Background"
                                     Value="{DynamicResource ButtonHoverBrush}"/>
@@ -46,7 +46,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
     <!-- Full ComboBox style -->
     <Style TargetType="ComboBox">
         <Setter Property="OverridesDefaultStyle"
@@ -59,6 +58,10 @@
                 Value="{DynamicResource PrimaryTextBrush}"/>
         <Setter Property="Padding"
                 Value="4"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment"
+                Value="Left"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
@@ -102,7 +105,7 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled"
-                                Value="False">
+                                 Value="False">
                             <Setter TargetName="MainBorder"
                                     Property="Background"
                                     Value="{DynamicResource ButtonDisabledBrush}"/>
@@ -110,7 +113,7 @@
                                     Value="{DynamicResource DisabledTextBrush}"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver"
-                                Value="True">
+                                 Value="True">
                             <Setter TargetName="MainBorder"
                                     Property="BorderBrush"
                                     Value="{DynamicResource HoverBorderBrush}"/>

@@ -2,6 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:BalatroSaveExplorer"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:conv="clr-namespace:BalatroSaveExplorer.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -47,6 +49,18 @@
 
 
             </ResourceDictionary.MergedDictionaries>
+            <conv:PercentageConverter x:Key="PercentConverter"/>
+
+            <sys:Double x:Key="AppMinWidth">400</sys:Double>
+            <!-- implicit style that gives *every* Control a MinWidth = 85% of its Window -->
+            <Style TargetType="Control">
+                <Setter Property="MinWidth"
+                        Value="{Binding
+                          Path=ActualWidth,
+                          RelativeSource={RelativeSource AncestorType=Window},
+                          Converter={StaticResource PercentConverter},
+                          ConverterParameter=0.85}"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

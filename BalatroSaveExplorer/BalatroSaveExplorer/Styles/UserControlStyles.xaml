@@ -6,6 +6,10 @@
                 Value="Transparent"/>
         <Setter Property="Foreground"
                 Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment"
+                Value="Stretch"/>
     </Style>
 
 </ResourceDictionary>

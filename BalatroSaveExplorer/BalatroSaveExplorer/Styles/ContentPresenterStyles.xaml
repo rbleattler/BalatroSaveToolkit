@@ -4,6 +4,8 @@
     <Style TargetType="ContentPresenter">
         <Setter Property="TextBlock.Foreground"
                 Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
     </Style>
 
 </ResourceDictionary>

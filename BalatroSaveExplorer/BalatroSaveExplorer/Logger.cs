@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace BalatroSaveExplorer;
 
 public class Logger

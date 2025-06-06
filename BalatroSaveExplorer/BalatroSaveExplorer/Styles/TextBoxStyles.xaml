@@ -13,6 +13,10 @@
                 Value="1"/>
         <Setter Property="Padding"
                 Value="4"/>
+        <Setter Property="MinWidth"
+                Value="{DynamicResource AppMinWidth}"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
         <Setter Property="SelectionBrush"
                 Value="{DynamicResource SelectionBackgroundBrush}"/>
         <Setter Property="CaretBrush"

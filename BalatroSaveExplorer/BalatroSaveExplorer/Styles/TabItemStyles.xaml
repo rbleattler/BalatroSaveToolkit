@@ -4,24 +4,24 @@
 
     <Style TargetType="TabItem">
         <Setter Property="OverridesDefaultStyle"
-                Value="True" />
-        <Setter Property="Width"
-                Value="Auto" />
+                Value="True"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
         <Setter Property="Background"
-                Value="{DynamicResource TabBackgroundBrush}" />
+                Value="{DynamicResource TabBackgroundBrush}"/>
         <Setter Property="Foreground"
-                Value="{DynamicResource PrimaryTextBrush}" />
+                Value="{DynamicResource PrimaryTextBrush}"/>
         <Setter Property="BorderBrush"
-                Value="{DynamicResource BorderBrush}" />
+                Value="{DynamicResource BorderBrush}"/>
         <Setter Property="BorderThickness"
-                Value="0,1,0,0" />
+                Value="0,1,0,0"/>
         <Setter Property="Padding"
-                Value="8,4" />
+                Value="8,4"/>
         <Setter Property="Margin"
-                Value="1.5,0" />
+                Value="1.5,0"/>
 
         <Setter Property="SnapsToDevicePixels"
-                Value="True" />
+                Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
@@ -41,7 +41,7 @@
                                               HorizontalAlignment="Center"
                                               ContentSource="Header"
                                               Margin="{TemplateBinding Padding}"
-                                              SnapsToDevicePixels="True" />
+                                              SnapsToDevicePixels="True"/>
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -49,15 +49,15 @@
                                  Value="True">
                             <Setter Property="Background"
                                     Value="{DynamicResource TabSelectedBrush}"
-                                    TargetName="Border" />
+                                    TargetName="Border"/>
                             <Setter Property="Panel.ZIndex"
-                                    Value="100" />
+                                    Value="100"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver"
                                  Value="True">
                             <Setter Property="Background"
                                     Value="{DynamicResource TabHoverBrush}"
-                                    TargetName="Border" />
+                                    TargetName="Border"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="assets\images\" />
+    <Folder Include="Templates\" />
   </ItemGroup>
 
 </Project>

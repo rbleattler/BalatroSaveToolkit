@@ -1,12 +1,7 @@
 ﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using Microsoft.Win32;
 using System.IO;
 using System.IO.Compression;
@@ -16,6 +11,7 @@ using BalatroSaveExplorer.Models;
 using System.Windows.Shell;
 using System.Windows.Threading;
 using System.Diagnostics;
+using BalatroSaveExplorer.Utilities;
 
 namespace BalatroSaveExplorer;
 
@@ -34,6 +30,9 @@ public partial class MainWindow : Window
     private DispatcherTimer _flashTimer;
     private int _flashCount;    // Settings management fields
     private AppSettings _workingSettings;
+
+    // e.g. 0.8 = 80%
+    private const double MinPct = 0.85;
 
     public MainWindow()
     {
@@ -62,6 +61,18 @@ public partial class MainWindow : Window
         ApplySettings();
 
         _logger.Log("Application started");
+
+        // Initialize global minimum width
+        SizeChanged += MainWindow_SizeChanged;
+        UpdateGlobalMinWidth(ActualWidth);
+    }
+
+    private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        => UpdateGlobalMinWidth(e.NewSize.Width);
+
+    private void UpdateGlobalMinWidth(double windowWidth)
+    {
+        Application.Current.Resources["AppMinWidth"] = windowWidth * MinPct;
     }
 
     /// <summary>
@@ -178,7 +189,8 @@ public partial class MainWindow : Window
         if (int.TryParse(MaxLogEntriesTextBox.Text, out int maxLogEntries))
         {
             _workingSettings.MaxLogEntries = maxLogEntries;
-        }        if (LogLevelComboBox.SelectedItem is ComboBoxItem selectedItem)
+        }
+        if (LogLevelComboBox.SelectedItem is ComboBoxItem selectedItem)
         {
             _workingSettings.LogLevel = selectedItem.Content.ToString() ?? "Info";
         }
@@ -313,7 +325,8 @@ public partial class MainWindow : Window
             LoadSettingsIntoControls();
             _logger.Log("Settings reset to defaults");
         }
-    }    private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    }
+    private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         UpdateBalatroDerivedPaths();
     }
@@ -1104,4 +1117,5 @@ public partial class MainWindow : Window
 
 
     #endregion
+
 }

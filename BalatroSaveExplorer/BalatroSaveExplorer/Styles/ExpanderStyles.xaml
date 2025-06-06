@@ -10,6 +10,10 @@
                 Value="{DynamicResource BorderBrush}"/>
         <Setter Property="BorderThickness"
                 Value="1"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment"
+                Value="Stretch"/>
     </Style>
 
 </ResourceDictionary>

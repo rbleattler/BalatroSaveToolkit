@@ -1,8 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.IO;
-using System.Reflection;
-using System.Windows;
+﻿using System.Windows;
 using BalatroSaveExplorer.Services;
 
 namespace BalatroSaveExplorer;

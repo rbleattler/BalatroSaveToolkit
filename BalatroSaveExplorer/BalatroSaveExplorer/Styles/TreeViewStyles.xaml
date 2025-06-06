@@ -3,20 +3,22 @@
 
     <Style TargetType="TreeView">
         <Setter Property="Background"
-                Value="{DynamicResource TreeViewBackgroundBrush}" />
+                Value="{DynamicResource TreeViewBackgroundBrush}"/>
         <Setter Property="Foreground"
-                Value="{DynamicResource PrimaryTextBrush}" />
+                Value="{DynamicResource PrimaryTextBrush}"/>
         <Setter Property="BorderBrush"
-                Value="{DynamicResource BorderBrush}" />
+                Value="{DynamicResource BorderBrush}"/>
         <Setter Property="BorderThickness"
-                Value="1" />
-        <Setter Property="Width"
-                Value="Auto" />
+                Value="1"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
+        <Setter Property="MinWidth"
+                Value="{DynamicResource AppMinWidth}"/>
 
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
-                Value="Auto" />
+                Value="Auto"/>
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
-                Value="Auto" />
+                Value="Auto"/>
     </Style>
 
 </ResourceDictionary>

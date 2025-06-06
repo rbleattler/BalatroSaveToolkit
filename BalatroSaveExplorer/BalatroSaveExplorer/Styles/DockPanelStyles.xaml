@@ -4,6 +4,10 @@
     <Style TargetType="DockPanel">
         <Setter Property="Background"
                 Value="{DynamicResource WindowBackgroundBrush}"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
+        <Setter Property="VerticalAlignment"
+                Value="Stretch"/>
     </Style>
 
 </ResourceDictionary>
