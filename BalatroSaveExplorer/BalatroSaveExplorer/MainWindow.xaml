@@ -9,21 +9,24 @@
         Height="800"
         Width="600"
         MinWidth="{DynamicResource AppMinWidth}">
-    <DockPanel>
-        <!-- Top toolbar -->
+    <DockPanel>        <!-- Top toolbar -->
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal"
                     Margin="10"
                     Height="40">
             <Button x:Name="LoadFileButton"
                     Content="Load JKR File"
-                    Width="120"
+                    MinWidth="120"
+                    MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                               Converter={StaticResource PercentConverter}, ConverterParameter=0.3}"
                     Height="30"
                     Click="LoadFileButton_Click"
                     Margin="0,0,10,0"/>
             <Button x:Name="SaveAsLuaButton"
                     Content="Save as Lua"
-                    Width="120"
+                    MinWidth="120"
+                    MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                               Converter={StaticResource PercentConverter}, ConverterParameter=0.3}"
                     Height="30"
                     Click="SaveAsLuaButton_Click"
                     Margin="0,0,10,0"
@@ -105,8 +108,7 @@
                         <StackPanel Margin="10">
                             <GroupBox Header="Balatro Integration"
                                       Margin="0,0,0,15">
-                                <StackPanel Margin="10">
-                                    <Label Content="Balatro Save Root Directory:"/>
+                                <StackPanel Margin="10">                                    <Label Content="Balatro Save Root Directory:"/>
                                     <Grid Margin="0,0,0,10">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -114,15 +116,15 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBox x:Name="InfoBalatroSaveRootTextBox"
                                                  Grid.Column="0"
+                                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                                  VerticalAlignment="Center"
                                                  Margin="0,0,5,0"
                                                  IsReadOnly="True"/>
                                     </Grid>
                                     <Separator Margin="0,5,0,10"/>
                                     <Label Content="Derived Paths:"
-                                           FontWeight="Bold"/>
-
-                                    <Label Content="Settings File:"
+                                           FontWeight="Bold"/>                                    <Label Content="Settings File:"
                                            Margin="0,5,0,0"/>
                                     <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
@@ -131,12 +133,14 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBox x:Name="InfoBalatroSettingsFilePathTextBox"
                                                  Grid.Column="0"
+                                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                                  IsReadOnly="True"
                                                  Margin="0,0,5,0"/>
                                         <Button x:Name="InfoLoadBalatroSettingsButton"
                                                 Grid.Column="1"
                                                 Content="Load"
-                                                Width="50"
+                                                MinWidth="50"
                                                 Height="25"
                                                 Click="LoadBalatroSettingsButton_Click"/>
                                     </Grid>
@@ -145,9 +149,7 @@
                                            Margin="0,5,0,0"/>
                                     <TextBox x:Name="InfoCurrentProfileNumberTextBox"
                                              IsReadOnly="True"
-                                             Margin="0,0,0,5"/>
-
-                                    <Label Content="Profile Settings:"
+                                             Margin="0,0,0,5"/>                                    <Label Content="Profile Settings:"
                                            Margin="0,5,0,0"/>
                                     <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
@@ -156,17 +158,17 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBox x:Name="InfoCurrentProfileSettingsPathTextBox"
                                                  Grid.Column="0"
+                                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                                  IsReadOnly="True"
                                                  Margin="0,0,5,0"/>
                                         <Button x:Name="InfoLoadProfileSettingsButton"
                                                 Grid.Column="1"
                                                 Content="Load"
-                                                Width="50"
+                                                MinWidth="50"
                                                 Height="25"
                                                 Click="LoadProfileSettingsButton_Click"/>
-                                    </Grid>
-
-                                    <Label Content="Profile Meta:"
+                                    </Grid>                                    <Label Content="Profile Meta:"
                                            Margin="0,5,0,0"/>
                                     <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
@@ -175,17 +177,17 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBox x:Name="InfoCurrentProfileMetaPathTextBox"
                                                  Grid.Column="0"
+                                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                                  IsReadOnly="True"
                                                  Margin="0,0,5,0"/>
                                         <Button x:Name="InfoLoadProfileMetaButton"
                                                 Grid.Column="1"
                                                 Content="Load"
-                                                Width="50"
+                                                MinWidth="50"
                                                 Height="25"
                                                 Click="LoadProfileMetaButton_Click"/>
-                                    </Grid>
-
-                                    <Label Content="Profile Save:"
+                                    </Grid>                                    <Label Content="Profile Save:"
                                            Margin="0,5,0,0"/>
                                     <Grid Margin="0,0,0,5">
                                         <Grid.ColumnDefinitions>
@@ -194,12 +196,14 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBox x:Name="InfoCurrentProfileSavePathTextBox"
                                                  Grid.Column="0"
+                                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                                  IsReadOnly="True"
                                                  Margin="0,0,5,0"/>
                                         <Button x:Name="InfoLoadProfileSaveButton"
                                                 Grid.Column="1"
                                                 Content="Load"
-                                                Width="50"
+                                                MinWidth="50"
                                                 Height="25"
                                                 Click="LoadProfileSaveButton_Click"/>
                                     </Grid>
@@ -227,10 +231,11 @@
                                     <StackPanel Margin="10">
                                         <GroupBox Header="Appearance"
                                                   Margin="0,0,0,15">
-                                            <StackPanel Margin="10">
-                                                <Label Content="Theme:"/>
+                                            <StackPanel Margin="10">                                                <Label Content="Theme:"/>
                                                 <ComboBox x:Name="ThemeComboBox"
-                                                          Width="200"
+                                                          MinWidth="200"
+                                                          MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                                                                     Converter={StaticResource PercentConverter}, ConverterParameter=0.5}"
                                                           HorizontalAlignment="Left"
                                                           Margin="0,5,0,10"
                                                           SelectionChanged="ThemeComboBox_SelectionChanged"
@@ -250,8 +255,7 @@
 
                                         <GroupBox Header="Default Directories"
                                                   Margin="0,0,0,15">
-                                            <StackPanel Margin="10">
-                                                <Label Content="Default JKR Directory:"/>
+                                            <StackPanel Margin="10">                                                <Label Content="Default JKR Directory:"/>
                                                 <Grid Margin="0,0,0,10">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
@@ -259,17 +263,17 @@
                                                     </Grid.ColumnDefinitions>
                                                     <TextBox x:Name="DefaultJkrDirectoryTextBox"
                                                              Grid.Column="0"
+                                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.75}"
                                                              VerticalAlignment="Center"
                                                              Margin="0,0,5,0"/>
                                                     <Button x:Name="BrowseJkrDirectoryButton"
                                                             Grid.Column="1"
                                                             Content="Browse..."
-                                                            Width="80"
+                                                            MinWidth="80"
                                                             Height="25"
                                                             Click="BrowseJkrDirectoryButton_Click"/>
-                                                </Grid>
-
-                                                <Label Content="Default Lua Export Directory:"/>
+                                                </Grid>                                                <Label Content="Default Lua Export Directory:"/>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
@@ -277,12 +281,14 @@
                                                     </Grid.ColumnDefinitions>
                                                     <TextBox x:Name="DefaultLuaExportDirectoryTextBox"
                                                              Grid.Column="0"
+                                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.75}"
                                                              VerticalAlignment="Center"
                                                              Margin="0,0,5,0"/>
                                                     <Button x:Name="BrowseLuaExportDirectoryButton"
                                                             Grid.Column="1"
                                                             Content="Browse..."
-                                                            Width="80"
+                                                            MinWidth="80"
                                                             Height="25"
                                                             Click="BrowseLuaExportDirectoryButton_Click"/>
                                                 </Grid>
@@ -319,8 +325,7 @@
 
                                         <GroupBox Header="Backup Settings"
                                                   Margin="0,0,0,15">
-                                            <StackPanel Margin="10">
-                                                <Label Content="Backup Directory:"/>
+                                            <StackPanel Margin="10">                                                <Label Content="Backup Directory:"/>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
@@ -328,12 +333,14 @@
                                                     </Grid.ColumnDefinitions>
                                                     <TextBox x:Name="BackupDirectoryTextBox"
                                                              Grid.Column="0"
+                                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.75}"
                                                              VerticalAlignment="Center"
                                                              Margin="0,0,5,0"/>
                                                     <Button x:Name="BrowseBackupDirectoryButton"
                                                             Grid.Column="1"
                                                             Content="Browse..."
-                                                            Width="80"
+                                                            MinWidth="80"
                                                             Height="25"
                                                             Click="BrowseBackupDirectoryButton_Click"/>
                                                 </Grid>
@@ -348,8 +355,7 @@
                                     <StackPanel Margin="10">
                                         <GroupBox Header="Balatro Save Root Configuration"
                                                   Margin="0,0,0,15">
-                                            <StackPanel Margin="10">
-                                                <Label Content="Balatro Save Root Directory:"/>
+                                            <StackPanel Margin="10">                                                <Label Content="Balatro Save Root Directory:"/>
                                                 <Grid Margin="0,0,0,10">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
@@ -357,13 +363,15 @@
                                                     </Grid.ColumnDefinitions>
                                                     <TextBox x:Name="BalatroSaveRootTextBox"
                                                              Grid.Column="0"
+                                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.75}"
                                                              VerticalAlignment="Center"
                                                              Margin="0,0,5,0"
                                                              TextChanged="BalatroSaveRootTextBox_TextChanged"/>
                                                     <Button x:Name="BrowseBalatroSaveRootButton"
                                                             Grid.Column="1"
                                                             Content="Browse..."
-                                                            Width="80"
+                                                            MinWidth="80"
                                                             Height="25"
                                                             Click="BrowseBalatroSaveRootButton_Click"/>
                                                 </Grid>
@@ -465,11 +473,11 @@
                                                            Margin="0,5,0,2"/>
                                                 <TextBox x:Name="SettingsFilePathTextBox"
                                                          IsReadOnly="True"
-                                                         Margin="0,0,0,10"/>
-
-                                                <Button x:Name="OpenSettingsFolderButton"
+                                                         Margin="0,0,0,10"/>                                                <Button x:Name="OpenSettingsFolderButton"
                                                         Content="Open Settings Folder"
-                                                        Width="150"
+                                                        MinWidth="150"
+                                                        MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                                                                   Converter={StaticResource PercentConverter}, ConverterParameter=0.6}"
                                                         HorizontalAlignment="Left"
                                                         Click="OpenSettingsFolderButton_Click"/>
                                             </StackPanel>
@@ -477,22 +485,24 @@
                                     </StackPanel>
                                 </ScrollViewer>
                             </TabItem>
-                        </TabControl>
-
-                        <!-- Settings action buttons -->
+                        </TabControl>                        <!-- Settings action buttons -->
                         <StackPanel Grid.Row="1"
                                     Orientation="Horizontal"
                                     HorizontalAlignment="Right"
                                     Margin="0,10,0,0">
                             <Button x:Name="ResetToDefaultsButton"
                                     Content="Reset to Defaults"
-                                    Width="120"
+                                    MinWidth="120"
+                                    MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                                               Converter={StaticResource PercentConverter}, ConverterParameter=0.4}"
                                     Height="30"
                                     Margin="0,0,10,0"
                                     Click="ResetToDefaultsButton_Click"/>
                             <Button x:Name="ApplySettingsButton"
                                     Content="Apply"
-                                    Width="80"
+                                    MinWidth="80"
+                                    MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                                               Converter={StaticResource PercentConverter}, ConverterParameter=0.3}"
                                     Height="30"
                                     Margin="0,0,10,0"
                                     Click="ApplySettingsButton_Click"/>
@@ -504,12 +514,11 @@
                          x:Name="FileInfoTab">
                     <ScrollViewer VerticalScrollBarVisibility="Auto"
                                   Margin="5">
-                        <StackPanel Margin="10">
-                            <GroupBox Header="File Information"
+                        <StackPanel Margin="10">                            <GroupBox Header="File Information"
                                       Margin="0,0,0,15">
                                 <Grid Margin="10">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto" MinWidth="120"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
@@ -524,62 +533,98 @@
                                     <Label Grid.Row="0"
                                            Grid.Column="0"
                                            Content="File Path:"
-                                           FontWeight="Bold"/>
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0"/>
                                     <TextBox Grid.Row="0"
                                              Grid.Column="1"
                                              x:Name="FilePathTextBox"
+                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.7}"
                                              IsReadOnly="True"
-                                             Margin="5,0,0,5"/>
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,0,5"/>
 
                                     <Label Grid.Row="1"
                                            Grid.Column="0"
                                            Content="File Size:"
-                                           FontWeight="Bold"/>
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0"/>
                                     <TextBox Grid.Row="1"
                                              Grid.Column="1"
                                              x:Name="FileSizeTextBox"
+                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.7}"
                                              IsReadOnly="True"
-                                             Margin="5,0,0,5"/>
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,0,5"/>
 
                                     <Label Grid.Row="2"
                                            Grid.Column="0"
                                            Content="Last Modified:"
-                                           FontWeight="Bold"/>
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0"/>
                                     <TextBox Grid.Row="2"
                                              Grid.Column="1"
                                              x:Name="LastModifiedTextBox"
+                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.7}"
                                              IsReadOnly="True"
-                                             Margin="5,0,0,5"/>
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,0,5"/>
 
                                     <Label Grid.Row="3"
                                            Grid.Column="0"
                                            Content="Compression:"
-                                           FontWeight="Bold"/>
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0"/>
                                     <TextBox Grid.Row="3"
                                              Grid.Column="1"
                                              x:Name="CompressionInfoTextBox"
+                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.7}"
                                              IsReadOnly="True"
-                                             Margin="5,0,0,5"/>
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,0,5"/>
 
                                     <Label Grid.Row="4"
                                            Grid.Column="0"
                                            Content="Content Type:"
-                                           FontWeight="Bold"/>
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0"/>
                                     <TextBox Grid.Row="4"
                                              Grid.Column="1"
                                              x:Name="ContentTypeTextBox"
+                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.7}"
                                              IsReadOnly="True"
-                                             Margin="5,0,0,5"/>
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,0,5"/>
 
                                     <Label Grid.Row="5"
                                            Grid.Column="0"
                                            Content="Entries Count:"
-                                           FontWeight="Bold"/>
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,10,0"/>
                                     <TextBox Grid.Row="5"
                                              Grid.Column="1"
                                              x:Name="EntriesCountTextBox"
+                                             MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                                        Converter={StaticResource PercentConverter}, ConverterParameter=0.7}"
                                              IsReadOnly="True"
-                                             Margin="5,0,0,5"/>
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,0,5"/>
                                 </Grid>
                             </GroupBox>
 

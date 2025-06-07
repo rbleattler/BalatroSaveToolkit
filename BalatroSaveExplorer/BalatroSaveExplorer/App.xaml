@@ -47,6 +47,13 @@
                 <ResourceDictionary Source="/Styles/WindowStyles.xaml"/>
                 <!-- EndRegion: Styles -->
 
+                <!-- Region: Templates -->
+                <ResourceDictionary Source="/Templates/FilePathSelectorTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/FilePathSelectorWithLoadTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/InfoDisplayTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/ButtonGroupTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/ToolbarButtonGroupTemplate.xaml"/>
+                <!-- EndRegion: Templates -->
 
             </ResourceDictionary.MergedDictionaries>
             <conv:PercentageConverter x:Key="PercentConverter"/>

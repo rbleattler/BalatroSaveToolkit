@@ -1,4 +1,6 @@
-﻿### core template
+﻿**/assets/images/
+/scratch/
+### core template
 *.swp
 *.*~
 project.lock.json

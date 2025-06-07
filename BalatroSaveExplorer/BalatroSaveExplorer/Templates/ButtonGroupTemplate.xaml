@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Template for horizontal button groups -->
+    <DataTemplate x:Key="ButtonGroupTemplate">
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+            <!-- Buttons will be added dynamically -->
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- Style for responsive buttons in button groups -->
+    <Style x:Key="ResponsiveButton" TargetType="Button">
+        <Setter Property="MinWidth" Value="80"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
+        <Setter Property="MaxWidth"
+                Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                        Converter={StaticResource PercentConverter}, ConverterParameter=0.2}"/>
+    </Style>
+
+</ResourceDictionary>

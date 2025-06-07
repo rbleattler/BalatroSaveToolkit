@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Template for top toolbar button groups -->
+    <DataTemplate x:Key="ToolbarButtonGroupTemplate">
+        <StackPanel Orientation="Horizontal"
+                    Height="40"
+                    Margin="10">
+            <!-- Buttons will be added dynamically -->
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- Style for responsive toolbar buttons -->
+    <Style x:Key="ResponsiveToolbarButton" TargetType="Button">
+        <Setter Property="MinWidth" Value="100"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Margin" Value="0,0,10,0"/>
+        <Setter Property="MaxWidth"
+                Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                        Converter={StaticResource PercentConverter}, ConverterParameter=0.3}"/>
+    </Style>
+
+</ResourceDictionary>
