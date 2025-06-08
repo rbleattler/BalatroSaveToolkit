@@ -46,13 +46,21 @@
                 <ResourceDictionary Source="/Styles/UserControlStyles.xaml"/>
                 <ResourceDictionary Source="/Styles/WindowStyles.xaml"/>
                 <!-- EndRegion: Styles -->
-
                 <!-- Region: Templates -->
                 <ResourceDictionary Source="/Templates/FilePathSelectorTemplate.xaml"/>
                 <ResourceDictionary Source="/Templates/FilePathSelectorWithLoadTemplate.xaml"/>
                 <ResourceDictionary Source="/Templates/InfoDisplayTemplate.xaml"/>
                 <ResourceDictionary Source="/Templates/ButtonGroupTemplate.xaml"/>
                 <ResourceDictionary Source="/Templates/ToolbarButtonGroupTemplate.xaml"/>
+
+                <!-- TabControl and TabItem Templates -->
+                <ResourceDictionary Source="/Templates/BaseTabControlTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/BaseTabItemTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/TreeViewTabItemTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/InfoTabItemTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/SettingsTabItemTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/FileInfoTabItemTemplate.xaml"/>
+                <ResourceDictionary Source="/Templates/SaveViewTabItemTemplate.xaml"/>
                 <!-- EndRegion: Templates -->
 
             </ResourceDictionary.MergedDictionaries>
