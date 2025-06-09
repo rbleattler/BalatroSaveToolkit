@@ -12,6 +12,7 @@ using System.Windows.Shell;
 using System.Windows.Threading;
 using System.Diagnostics;
 using BalatroSaveExplorer.Utilities;
+using BalatroSaveExplorer.Converters;
 
 namespace BalatroSaveExplorer;
 

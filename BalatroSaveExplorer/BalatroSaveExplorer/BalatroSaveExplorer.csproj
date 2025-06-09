@@ -12,5 +12,10 @@
     <Folder Include="assets\images\" />
     <Folder Include="Templates\" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- pick up all generated XAML code-behind files -->
+    <Compile Include="obj\$(Configuration)\$(TargetFramework)\**\*.g.cs" />
+  </ItemGroup>
+
 
 </Project>
