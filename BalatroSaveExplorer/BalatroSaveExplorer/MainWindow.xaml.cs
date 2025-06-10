@@ -48,9 +48,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         // Initialize logger first
-        _logger = new Logger();
-
-        // Initialize services
+        _logger = new Logger();        // Initialize services
         _jkrFileService = new JkrFileService(_logger);
         _backupService = new BackupService(_logger);
         _fileWatchingService = new FileWatchingService(_logger);

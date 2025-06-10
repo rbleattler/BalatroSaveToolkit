@@ -11,14 +11,17 @@ namespace BalatroSaveExplorer.Models;
 public class AppSettings : INotifyPropertyChanged
 {
     private static string _appDataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BalatroSaveExplorer");
+    public static string AppDataDirectory => _appDataDirectory;
+    private string _balatroSaveRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Balatro");
     private string _defaultJkrDirectory = Path.Combine(_appDataDirectory, "Saves");
     private string _defaultLuaExportDirectory = Path.Combine(_appDataDirectory, "LuaExports");
+    private string _backupDirectory = Path.Combine(_appDataDirectory, "BalatroBackups");
     private bool _showLogsOnStartup = false;
+
     private bool _autoSaveDecompressedFiles = false;
     private bool _confirmFileOverwrites = true;
     private string _logLevel = "Info"; private int _maxLogEntries = 1000;
     private bool _enableAutoBackup = true;
-    private string _backupDirectory = Path.Combine(_appDataDirectory, "BalatroBackups");    private string _balatroSaveRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Balatro");
 
     // Theme settings
     private AppTheme _theme = AppTheme.System;
@@ -161,9 +164,9 @@ public class AppSettings : INotifyPropertyChanged
                                                                                                                            /// Path to current profile's save file (derived)
                                                                                                                            /// </summary>    public string CurrentProfileSavePath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "save.jkr");
 
-    /// <summary>
-    /// Application theme setting
-    /// </summary>
+                                                                                                                           /// <summary>
+                                                                                                                           /// Application theme setting
+                                                                                                                           /// </summary>
     public AppTheme Theme
     {
         get => _theme;

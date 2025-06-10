@@ -14,11 +14,10 @@ public class BackupService
 {
   private readonly Logger _logger;
   private readonly string _backupDirectory;
-
-  public BackupService(Logger logger, string backupDirectory = "Backups")
+  public BackupService(Logger logger)
   {
     _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    _backupDirectory = backupDirectory;
+    _backupDirectory = SettingsManager.Instance.Settings.BackupDirectory;
 
     // Ensure backup directory exists
     if (!Directory.Exists(_backupDirectory))
