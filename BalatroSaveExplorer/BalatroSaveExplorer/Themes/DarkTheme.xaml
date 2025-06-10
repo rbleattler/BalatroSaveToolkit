@@ -174,7 +174,7 @@
     <!-- GroupBox Colors -->
     <SolidColorBrush
         x:Key="GroupBoxHeaderBrush"
-        Color="#3F3F46"/>
+        Color="#E0E0E0"/>
     <SolidColorBrush
         x:Key="GroupBoxBackgroundBrush"
         Color="#252526"/>

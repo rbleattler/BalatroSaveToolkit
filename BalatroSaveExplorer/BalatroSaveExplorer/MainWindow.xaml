@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BalatroSaveExplorer"
+        xmlns:controls="clr-namespace:BalatroSaveExplorer.Controls"
         mc:Ignorable="d"
         Title="Balatro JKR File Viewer"
         Height="800"
@@ -84,24 +85,10 @@
                         Grid.Row="0"
                         Margin="10,0,10,10">
                 <!-- Tree View Tab -->
-
                 <TabItem Header="Tree View"
                          x:Name="TreeViewTab">
-                    <TreeView x:Name="DataTreeView"
-                              Margin="5">
-                        <!-- TODO: Add a heading so the empty tree view before loading a file doesn't look so strange -->
-                        <!-- TODO: OR add a schema-esque empty tree for users to browse -->
-                        <TreeView.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding DisplayName}"
-                                               FontWeight="Bold"
-                                               Margin="0,0,5,0"/>
-                                    <TextBlock Text="{Binding ValueDisplay}"/>
-                                </StackPanel>
-                            </HierarchicalDataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
+                    <controls:SearchableTreeView x:Name="DataTreeView"
+                                                 Margin="10"/>
                 </TabItem>
                 <!-- Info Tab -->
                 <TabItem Header="Info"
