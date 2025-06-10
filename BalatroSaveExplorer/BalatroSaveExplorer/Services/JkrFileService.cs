@@ -168,7 +168,7 @@ public class JkrFileService
       // Try to read a small portion to see if it's accessible
       using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
       var buffer = new byte[Math.Min(1024, fileInfo.Length)];
-      stream.Read(buffer, 0, buffer.Length);
+      stream.ReadExactly(buffer);
 
       return true;
     }

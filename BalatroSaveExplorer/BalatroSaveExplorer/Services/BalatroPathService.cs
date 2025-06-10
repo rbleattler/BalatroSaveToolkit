@@ -18,44 +18,28 @@ public class BalatroPathService
     public BalatroPathService(Logger logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    /// <summary>
-    /// Updates the derived Balatro paths in the UI controls
-    /// </summary>
-    public void UpdateBalatroDerivedPaths(string saveRoot,
-        TextBox infoBalatroSaveRootTextBox,
-        TextBox infoBalatroSettingsFilePathTextBox,
-        TextBox infoCurrentProfileNumberTextBox,
-        TextBox infoCurrentProfileSettingsPathTextBox,
-        TextBox infoCurrentProfileMetaPathTextBox,
-        TextBox infoCurrentProfileSavePathTextBox)
+    }    /// <summary>
+         /// Updates the derived Balatro paths using a callback function
+         /// </summary>
+    public void UpdateBalatroDerivedPaths(string saveRoot, Action<string, string, string, string, string, string> updateCallback)
     {
         if (string.IsNullOrWhiteSpace(saveRoot))
         {
-            // Clear Info tab controls
-            infoBalatroSaveRootTextBox.Text = "";
-            infoBalatroSettingsFilePathTextBox.Text = "";
-            infoCurrentProfileNumberTextBox.Text = "";
-            infoCurrentProfileSettingsPathTextBox.Text = "";
-            infoCurrentProfileMetaPathTextBox.Text = "";
-            infoCurrentProfileSavePathTextBox.Text = "";
+            // Clear paths
+            updateCallback("", "", "", "", "", "");
             return;
         }
 
         try
         {
             var settingsPath = Path.Combine(saveRoot, "settings.jkr");
-
-            // Update Info tab controls
-            infoBalatroSaveRootTextBox.Text = saveRoot;
-            infoBalatroSettingsFilePathTextBox.Text = settingsPath;
-            infoCurrentProfileNumberTextBox.Text = "1"; // Default profile
-
+            var profileNumber = "1"; // Default profile
             var profilePath = Path.Combine(saveRoot, "1");
-            infoCurrentProfileSettingsPathTextBox.Text = Path.Combine(profilePath, "profile.jkr");
-            infoCurrentProfileMetaPathTextBox.Text = Path.Combine(profilePath, "meta.jkr");
-            infoCurrentProfileSavePathTextBox.Text = Path.Combine(profilePath, "save.jkr");
+            var profileSettingsPath = Path.Combine(profilePath, "profile.jkr");
+            var profileMetaPath = Path.Combine(profilePath, "meta.jkr");
+            var profileSavePath = Path.Combine(profilePath, "save.jkr");
+
+            updateCallback(saveRoot, settingsPath, profileNumber, profileSettingsPath, profileMetaPath, profileSavePath);
         }
         catch (Exception ex)
         {

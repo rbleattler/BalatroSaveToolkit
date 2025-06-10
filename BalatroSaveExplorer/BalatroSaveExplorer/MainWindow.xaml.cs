@@ -20,7 +20,8 @@ namespace BalatroSaveExplorer;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : Window
-{    // Services
+{
+    // Services
     private readonly Logger _logger;
     private readonly JkrFileService _jkrFileService;
     private readonly BackupService _backupService;
@@ -33,12 +34,13 @@ public partial class MainWindow : Window
     private readonly FileChangeHandlerService _fileChangeHandlerService;
 
     // UI-specific fields only
-    private readonly ObservableCollection<TreeNodeViewModel> _treeNodes;
     private string? _currentFilePath;
     private string? _currentDecompressedContent;
 
     // Settings management fields
-    private AppSettings _workingSettings;    // e.g. 0.8 = 80%
+    private AppSettings _workingSettings;
+
+    // e.g. 0.8 = 80%
     private const double MinPct = 0.85;
 
     public MainWindow()
@@ -46,7 +48,9 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         // Initialize logger first
-        _logger = new Logger();        // Initialize services
+        _logger = new Logger();
+
+        // Initialize services
         _jkrFileService = new JkrFileService(_logger);
         _backupService = new BackupService(_logger);
         _fileWatchingService = new FileWatchingService(_logger);
@@ -55,20 +59,40 @@ public partial class MainWindow : Window
         _fileLoadingService = new FileLoadingService(_logger, _jkrFileService, _backupService, _uiStateService, _fileWatchingService);
         _settingsUIService = new SettingsUIService(_logger);
         _balatroPathService = new BalatroPathService(_logger);
-        _fileChangeHandlerService = new FileChangeHandlerService(_logger, _uiStateService);// Initialize UI components
-        _treeNodes = new ObservableCollection<TreeNodeViewModel>();
-        DataTreeView.ItemsSource = _treeNodes;
+        _fileChangeHandlerService = new FileChangeHandlerService(_logger, _uiStateService);
 
         // Subscribe to logger events
-        _logger.LogAdded += OnLogAdded;
-
-        // Subscribe to service events
+        _logger.LogAdded += OnLogAdded;        // Subscribe to service events
         _fileWatchingService.FileChanged += OnFileWatchingService_FileChanged;        // Initialize settings
         _workingSettings = SettingsService.CloneSettings(SettingsManager.Instance.Settings);
-        LoadSettingsIntoControls();
 
-        // Set the settings file path for display
-        SettingsFilePathTextBox.Text = SettingsManager.Instance.GetSettingsFilePath();
+        // Set up InfoTab callbacks
+        InfoTabControl.LoadFileCallback = LoadFile;
+        InfoTabControl.SwitchToTreeViewTabCallback = () => MainTabControl.SelectedItem = TreeViewTab;
+
+        // Set up SettingsTab callbacks and dependencies
+        SettingsTabControl.SettingsUIService = _settingsUIService;
+        SettingsTabControl.Logger = _logger;
+        SettingsTabControl.LogPanelRow = LogPanelRow;
+        SettingsTabControl.WorkingSettings = _workingSettings;
+        SettingsTabControl.ApplySettingsCallback = (settings, saveControls, applyChanges, getSettings, setSettings) =>
+        {
+            _settingsUIService.ApplySettings(saveControls, applyChanges, getSettings, setSettings);
+        };
+        SettingsTabControl.ResetToDefaultsCallback = (setSettings, loadControls) =>
+        {
+            _settingsUIService.ResetToDefaults(setSettings, loadControls);
+        }; SettingsTabControl.BrowseBalatroSaveRootCallback = (path, updateCallback) =>
+        {
+            // The SettingsTab UserControl will handle this internally via SettingsUIService
+            _settingsUIService.BrowseBalatroSaveRoot(SettingsTabControl.BalatroSaveRootTextBoxControl, updateCallback);
+        };
+        SettingsTabControl.UpdateBalatroDerivedPathsCallback = UpdateBalatroDerivedPaths; SettingsTabControl.ShowLogPanelCallback = (logPanelRow, logger) => LogPanelManager.ShowLogPanel(logPanelRow, logger);
+        SettingsTabControl.HideLogPanelCallback = (logPanelRow, logger) => LogPanelManager.HideLogPanel(logPanelRow, logger);
+
+        // Set the settings file path for display and load settings into controls
+        SettingsTabControl.SetSettingsFilePath(SettingsManager.Instance.GetSettingsFilePath());
+        SettingsTabControl.LoadSettingsIntoControls();
 
         // Apply settings on startup
         ApplySettings();
@@ -86,20 +110,21 @@ public partial class MainWindow : Window
     private void UpdateGlobalMinWidth(double windowWidth)
     {
         Application.Current.Resources["AppMinWidth"] = windowWidth * MinPct;
-    }
-
-    /// <summary>
-    /// Applies current settings to the UI
-    /// </summary>
+    }    /// <summary>
+         /// Applies current settings to the UI
+         /// </summary>
     private void ApplySettings()
     {
-        var settings = SettingsManager.Instance.Settings;        // Show logs panel if configured to do so
+        var settings = SettingsManager.Instance.Settings;
+
+        // Show logs panel if configured to do so
         if (settings.ShowLogsOnStartup)
         {
-            ShowLogsCheckBox.IsChecked = true;
+            SettingsTabControl.SetShowLogsCheckBox(true);
             LogPanelRow.Height = new GridLength(200);
         }
     }
+
     private async void LoadFileButton_Click(object sender, RoutedEventArgs e)
     {
         var filePath = FileOperations.ShowOpenJkrFileDialog();
@@ -108,166 +133,32 @@ public partial class MainWindow : Window
             await LoadFile(filePath);
         }
     }
-
     #region Settings Management
-    /// <summary>
-    /// Loads the working settings into the UI controls
-    /// </summary>
-    private void LoadSettingsIntoControls()
-    {
-        _settingsUIService.LoadSettingsIntoControls(_workingSettings,
-            DefaultJkrDirectoryTextBox, DefaultLuaExportDirectoryTextBox,
-            ShowLogsOnStartupCheckBox, AutoSaveDecompressedFilesCheckBox,
-            ConfirmFileOverwritesCheckBox, EnableAutoBackupCheckBox,
-            BackupDirectoryTextBox, BalatroSaveRootTextBox, MaxLogEntriesTextBox,
-            EnableFileWatchingCheckBox, FlashTaskbarOnUpdateCheckBox,
-            AutoRefreshOnFileChangeCheckBox, LogLevelComboBox, ThemeComboBox,
-            UpdateBalatroDerivedPaths);
-    }    /// <summary>
-         /// Saves the UI control values back to the working settings
-         /// </summary>
-    private void SaveControlsToSettings()
-    {
-        _settingsUIService.SaveControlsToSettings(_workingSettings,
-            DefaultJkrDirectoryTextBox, DefaultLuaExportDirectoryTextBox,
-            ShowLogsOnStartupCheckBox, AutoSaveDecompressedFilesCheckBox,
-            ConfirmFileOverwritesCheckBox, EnableAutoBackupCheckBox,
-            BackupDirectoryTextBox, BalatroSaveRootTextBox, MaxLogEntriesTextBox,
-            EnableFileWatchingCheckBox, FlashTaskbarOnUpdateCheckBox,
-            AutoRefreshOnFileChangeCheckBox, LogLevelComboBox, ThemeComboBox);
-    }    /// <summary>
-         /// Applies the working settings to the global settings manager
-         /// </summary>
-    private void ApplySettingsChanges()
-    {
-        SettingsService.ApplySettingsChanges(_workingSettings);
-    }
-    private void BrowseJkrDirectoryButton_Click(object sender, RoutedEventArgs e)
-    {
-        _settingsUIService.BrowseJkrDirectory(DefaultJkrDirectoryTextBox);
-    }
-
-    private void BrowseLuaExportDirectoryButton_Click(object sender, RoutedEventArgs e)
-    {
-        _settingsUIService.BrowseLuaExportDirectory(DefaultLuaExportDirectoryTextBox);
-    }
-
-    private void BrowseBackupDirectoryButton_Click(object sender, RoutedEventArgs e)
-    {
-        _settingsUIService.BrowseBackupDirectory(BackupDirectoryTextBox);
-    }
-
-    private void BrowseBalatroSaveRootButton_Click(object sender, RoutedEventArgs e)
-    {
-        _settingsUIService.BrowseBalatroSaveRoot(BalatroSaveRootTextBox, UpdateBalatroDerivedPaths);
-    }
-    private void ApplySettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        _settingsUIService.ApplySettings(
-            SaveControlsToSettings,
-            ApplySettingsChanges,
-            () => _workingSettings,
-            (settings) => _workingSettings = settings);
-    }
-
-    private void ResetToDefaultsButton_Click(object sender, RoutedEventArgs e)
-    {
-        _settingsUIService.ResetToDefaults(
-            (settings) => _workingSettings = settings,
-            LoadSettingsIntoControls);
-    }
-    private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        UpdateBalatroDerivedPaths();
-    }
-    private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        // Only apply theme change if the selection is from user interaction
-        // (not from programmatic loading)
-        if (ThemeComboBox.SelectedItem is ComboBoxItem selectedItem && IsLoaded)
-        {
-            _settingsUIService.HandleThemeChange(_workingSettings, selectedItem, IsLoaded);
-        }
-    }
     private void UpdateBalatroDerivedPaths()
     {
-        _balatroPathService.UpdateBalatroDerivedPaths(BalatroSaveRootTextBox.Text,
-            InfoBalatroSaveRootTextBox, InfoBalatroSettingsFilePathTextBox,
-            InfoCurrentProfileNumberTextBox, InfoCurrentProfileSettingsPathTextBox,
-            InfoCurrentProfileMetaPathTextBox, InfoCurrentProfileSavePathTextBox);
-    }
-    private async void LoadBalatroSettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        await _balatroPathService.LoadBalatroSettingsFileAsync(
-            InfoBalatroSettingsFilePathTextBox.Text,
-            LoadFile,
-            () => MainTabControl.SelectedItem = TreeViewTab);
-    }
-
-    private async void LoadProfileSettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        await _balatroPathService.LoadProfileSettingsAsync(
-            InfoCurrentProfileSettingsPathTextBox.Text,
-            LoadFile,
-            () => MainTabControl.SelectedItem = TreeViewTab);
-    }
-
-    private async void LoadProfileMetaButton_Click(object sender, RoutedEventArgs e)
-    {
-        await _balatroPathService.LoadProfileMetaAsync(
-            InfoCurrentProfileMetaPathTextBox.Text,
-            LoadFile,
-            () => MainTabControl.SelectedItem = TreeViewTab);
-    }
-
-    private async void LoadProfileSaveButton_Click(object sender, RoutedEventArgs e)
-    {
-        await _balatroPathService.LoadProfileSaveAsync(
-            InfoCurrentProfileSavePathTextBox.Text,
-            LoadFile,
-            () => MainTabControl.SelectedItem = TreeViewTab);
-    }
-
-    private void OpenSettingsFolderButton_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            var settingsPath = SettingsManager.Instance.GetSettingsFilePath();
-            var directory = Path.GetDirectoryName(settingsPath);
-
-            if (!string.IsNullOrEmpty(directory) && Directory.Exists(directory))
+        _balatroPathService.UpdateBalatroDerivedPaths(SettingsTabControl.BalatroSaveRootTextBoxControl.Text,
+            (rootPath, settingsPath, profileNumber, profileSettingsPath, profileMetaPath, profileSavePath) =>
             {
-                Process.Start("explorer.exe", directory);
-            }
-            else
-            {
-                MessageBox.Show("Settings directory not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.Log($"Error opening settings folder: {ex.Message}");
-            MessageBox.Show($"Error opening settings folder: {ex.Message}", "Error",
-                          MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+                InfoTabControl.UpdateBalatroDerivedPaths(rootPath, settingsPath, profileNumber,
+                    profileSettingsPath, profileMetaPath, profileSavePath);
+            });
     }
-
     #endregion
 
     #region File Operations
 
     private async Task LoadFile(string filePath)
     {
-        // Create loading context with UI elements
+        // Create loading context with UI elements from FileInfoTab
         var context = new FileLoadingContext(
-            _treeNodes,
-            RawContentTextBox,
-            FilePathTextBox,
-            FileSizeTextBox,
-            LastModifiedTextBox,
-            CompressionInfoTextBox,
-            ContentTypeTextBox,
-            EntriesCountTextBox,
+            TreeViewTabControl.TreeNodes,
+            FileInfoTabControl.GetRawContentTextBox(),
+            FileInfoTabControl.GetFilePathTextBox(),
+            FileInfoTabControl.GetFileSizeTextBox(),
+            FileInfoTabControl.GetLastModifiedTextBox(),
+            FileInfoTabControl.GetCompressionInfoTextBox(),
+            FileInfoTabControl.GetContentTypeTextBox(),
+            FileInfoTabControl.GetEntriesCountTextBox(),
             (path, content) =>
             {
                 _currentFilePath = path;
@@ -285,17 +176,6 @@ public partial class MainWindow : Window
         // Update Lua button state after loading (success or failure)
         UpdateSaveAsLuaButtonState();
     }
-
-    private void ShowLogsCheckBox_Checked(object sender, RoutedEventArgs e)
-    {
-        LogPanelManager.ShowLogPanel(LogPanelRow, _logger);
-    }
-
-    private void ShowLogsCheckBox_Unchecked(object sender, RoutedEventArgs e)
-    {
-        LogPanelManager.HideLogPanel(LogPanelRow, _logger);
-    }
-
     private void ClearLogsButton_Click(object sender, RoutedEventArgs e)
     {
         LogPanelManager.ClearLogs(_logger, LogTextBox);
@@ -335,6 +215,7 @@ public partial class MainWindow : Window
     {
         LogPanelManager.HandleLogAdded(LogTextBox, logMessage, Dispatcher);
     }
+
     protected override void OnClosed(EventArgs e)
     {
         // Clean up file watching resources
@@ -348,6 +229,31 @@ public partial class MainWindow : Window
     private void OnFileWatchingService_FileChanged(object? sender, string filePath)
     {
         _fileChangeHandlerService.HandleFileChange(filePath, _currentFilePath, LoadFile, Dispatcher);
+    }
+
+    private void OpenSettingsFolderButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var settingsPath = SettingsManager.Instance.GetSettingsFilePath();
+            var settingsDirectory = Path.GetDirectoryName(settingsPath);
+
+            if (!string.IsNullOrEmpty(settingsDirectory) && Directory.Exists(settingsDirectory))
+            {
+                Process.Start(new ProcessStartInfo()
+                {
+                    FileName = settingsDirectory,
+                    UseShellExecute = true,
+                    Verb = "open"
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Error opening settings folder: {ex.Message}");
+            MessageBox.Show($"Could not open settings folder: {ex.Message}", "Error",
+                           MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     #endregion
