@@ -1,11 +1,15 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using BalatroSaveExplorer.Models;
 
 namespace BalatroSaveExplorer.Controls
 {
   public partial class SearchableTreeView : UserControl
   {
+    private ObservableCollection<TreeNodeViewModel>? _currentItemsSource;
+
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(
             nameof(ItemsSource),
@@ -18,13 +22,49 @@ namespace BalatroSaveExplorer.Controls
       get => (ObservableCollection<TreeNodeViewModel>?)GetValue(ItemsSourceProperty);
       set => SetValue(ItemsSourceProperty, value);
     }
+
     private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-      if (d is SearchableTreeView control && control.DataContext is SearchableTreeViewViewModel viewModel)
+      if (d is SearchableTreeView control)
       {
-        viewModel.OriginalItems = e.NewValue as ObservableCollection<TreeNodeViewModel>;
+        control.UpdateItemsSource(e.OldValue as ObservableCollection<TreeNodeViewModel>,
+                                  e.NewValue as ObservableCollection<TreeNodeViewModel>);
       }
     }
+
+    private void UpdateItemsSource(ObservableCollection<TreeNodeViewModel>? oldCollection,
+                                  ObservableCollection<TreeNodeViewModel>? newCollection)
+    {
+      // Unsubscribe from old collection changes
+      if (_currentItemsSource != null)
+      {
+        _currentItemsSource.CollectionChanged -= OnItemsSourceCollectionChanged;
+      }
+
+      _currentItemsSource = newCollection;
+
+      // Subscribe to new collection changes
+      if (_currentItemsSource != null)
+      {
+        _currentItemsSource.CollectionChanged += OnItemsSourceCollectionChanged;
+      }
+
+      // Update the ViewModel
+      if (DataContext is SearchableTreeViewViewModel viewModel)
+      {
+        viewModel.OriginalItems = newCollection;
+      }
+    }
+
+    private void OnItemsSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+      // When the collection changes, update the ViewModel to refresh the display
+      if (DataContext is SearchableTreeViewViewModel viewModel)
+      {
+        viewModel.RefreshItems();
+      }
+    }
+
     public SearchableTreeView()
     {
       InitializeComponent();
@@ -36,7 +76,7 @@ namespace BalatroSaveExplorer.Controls
       // If ItemsSource is already set (unlikely but possible), update the ViewModel
       if (ItemsSource != null)
       {
-        viewModel.OriginalItems = ItemsSource;
+        UpdateItemsSource(null, ItemsSource);
       }
 
       Loaded += UserControl_Loaded;
@@ -44,7 +84,7 @@ namespace BalatroSaveExplorer.Controls
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
-      if (DataContext is SearchableTreeViewViewModel viewModel)
+      if (DataContext is SearchableTreeViewViewModel viewModel && ItemsSource != null)
       {
         viewModel.OriginalItems = ItemsSource;
       }

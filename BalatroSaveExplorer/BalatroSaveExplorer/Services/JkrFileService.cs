@@ -17,16 +17,10 @@ namespace BalatroSaveExplorer.Services;
 public class JkrFileService
 {
   private readonly Logger _logger;
-
   public JkrFileService(Logger logger)
   {
     _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-  }    // TODO: Migrate from MainWindow
-       // - DecompressJkrFile method
-       // - ParseJsonContent method
-       // - ValidateJkrFile method
-       // - GetFileInfo method
-       // - CompressToJkr method (for saving)
+  }
 
   /// <summary>
   /// Processes a JKR file from start to finish.

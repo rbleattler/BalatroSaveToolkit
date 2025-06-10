@@ -27,12 +27,7 @@ public class BackupService
     }
   }
 
-  // TODO: Migrate from MainWindow
-  // - CreateBackup method
-  // - RestoreBackup method
-  // - GetBackupList method
-  // - CleanupOldBackups method
-  // - GetBackupInfo method    /// <summary>
+  /// <summary>
   /// Creates a backup of the specified file.
   /// </summary>
   /// <param name="sourceFilePath">Path to the file to backup</param>

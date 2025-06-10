@@ -75,7 +75,6 @@ namespace BalatroSaveExplorer.Controls
         FilterItems();
       };
     }
-
     private void FilterItems()
     {
       if (OriginalItems == null)
@@ -104,6 +103,14 @@ namespace BalatroSaveExplorer.Controls
       }
 
       FilteredItems = filtered;
+    }
+
+    /// <summary>
+    /// Refreshes the filtered items based on current search text and original items
+    /// </summary>
+    public void RefreshItems()
+    {
+      FilterItems();
     }
 
     private TreeNodeViewModel? FilterItem(TreeNodeViewModel item, string searchText)

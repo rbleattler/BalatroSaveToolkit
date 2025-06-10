@@ -26,13 +26,6 @@ public class FileWatchingService : IDisposable
     _logger = logger ?? throw new ArgumentNullException(nameof(logger));
   }
 
-  // TODO: Migrate from MainWindow
-  // - StartWatching method
-  // - StopWatching method
-  // - OnFileChanged event handler
-  // - OnFileDeleted event handler
-  // - OnFileCreated event handler
-  // - File watching state management
   /// <summary>
   /// Starts watching the specified file or directory.
   /// </summary>

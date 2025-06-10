@@ -178,7 +178,6 @@ public class UIStateService : INotifyPropertyChanged
     UpdateProgress(0, TaskbarItemProgressState.Indeterminate);
     _logger.Log($"Started processing: {message}");
   }
-
   /// <summary>
   /// Hides the processing state.
   /// </summary>
@@ -188,38 +187,6 @@ public class UIStateService : INotifyPropertyChanged
     UpdateProgress(0, TaskbarItemProgressState.None);
     UpdateStatus("Ready");
     _logger.Log("Processing completed");
-  }
-
-  /// <summary>
-  /// Updates the tree view with new data.
-  /// </summary>
-  /// <param name="treeNodes">New tree node collection</param>
-  public void UpdateTreeView(ObservableCollection<TreeNodeViewModel> treeNodes)
-  {
-    // This method is intended to be called from the UI thread to update the tree view
-    // The actual tree view binding should be handled by the UI layer
-    _logger.Log($"Tree view updated with {treeNodes?.Count ?? 0} nodes");
-  }
-
-  /// <summary>
-  /// Expands tree nodes to a specified level.
-  /// </summary>
-  /// <param name="level">Level to expand to</param>
-  public void ExpandTreeToLevel(int level)
-  {
-    // This is a placeholder - actual tree expansion should be handled by the UI layer
-    // that has access to the TreeView control
-    _logger.Log($"Expand tree to level {level} requested");
-  }
-
-  /// <summary>
-  /// Collapses all tree nodes.
-  /// </summary>
-  public void CollapseAllTreeNodes()
-  {
-    // This is a placeholder - actual tree collapse should be handled by the UI layer
-    // that has access to the TreeView control
-    _logger.Log("Collapse all tree nodes requested");
   }
 
   /// <summary>
