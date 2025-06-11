@@ -16,6 +16,8 @@
                 Value="Stretch"/>
         <Setter Property="HorizontalContentAlignment"
                 Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment"
+                Value="Stretch"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="GroupBox">
@@ -48,6 +50,8 @@
                         </Border>
                         <ContentPresenter Grid.Row="1"
                                           Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Stretch"
                                           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                     </Grid>
                 </ControlTemplate>

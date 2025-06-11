@@ -30,7 +30,7 @@
                                                         <Rectangle Fill="{TemplateBinding Background}"
                                                                    RadiusX="4"
                                                                    RadiusY="4"
-                                                                   Margin="2"/>
+                                                                   Margin="1"/>
                                                     </ControlTemplate>
                                                 </Setter.Value>
                                             </Setter>

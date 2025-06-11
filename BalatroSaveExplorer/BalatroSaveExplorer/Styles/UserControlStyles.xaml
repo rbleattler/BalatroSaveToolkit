@@ -9,9 +9,6 @@
                 Value="Stretch"/>
         <Setter Property="HorizontalContentAlignment"
                 Value="Stretch"/>
-        <!-- Ensure UserControls respect global AppMinWidth -->
-        <Setter Property="MinWidth"
-                Value="{DynamicResource AppMinWidth}"/>
     </Style>
 
 </ResourceDictionary>

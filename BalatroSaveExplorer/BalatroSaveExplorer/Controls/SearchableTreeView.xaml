@@ -2,179 +2,193 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:BalatroSaveExplorer.Controls"
-             xmlns:converters="clr-namespace:BalatroSaveExplorer.Converters">
-
+             xmlns:converters="clr-namespace:BalatroSaveExplorer.Converters"
+             HorizontalAlignment="Stretch"
+             HorizontalContentAlignment="Stretch">
     <UserControl.Resources>
         <converters:StringNullOrEmptyToBoolConverter x:Key="StringNullOrEmptyToBoolConverter"/>
+        <converters:PercentageConverter x:Key="PercentageConverter"/>
     </UserControl.Resources>
-    <Grid Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <!-- Search Box -->
-        <Border Grid.Row="0"
-                Background="{DynamicResource InputBackgroundBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Margin="0,0,0,10"
-                MinHeight="32">
-            <Grid Margin="4,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <StackPanel
+            Margin="10"
+            MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=GroupBox},
+                                 Converter={StaticResource PercentageConverter}, ConverterParameter=0.90}">
 
-                <!-- Search TextBox -->
-                <TextBox x:Name="SearchTextBox"
-                         Grid.Column="1"
-                         Background="Transparent"
-                         BorderThickness="0"
-                         Foreground="{DynamicResource PrimaryTextBrush}"
-                         FontSize="{DynamicResource StandardFontSize}"
-                         Padding="4,8"
-                         VerticalAlignment="Center"
-                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+            <Grid Margin="0"
+                  HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <!-- Search Box -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource InputBackgroundBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Margin="0,0,0,10"
+                        MinHeight="32"
+                        HorizontalAlignment="Stretch">
+                    <Grid Margin="4,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                <!-- Search Placeholder -->
-                <TextBlock Grid.Column="1"
-                           Text="🔍 Search tree..."
-                           Foreground="{DynamicResource SecondaryTextBrush}"
-                           FontSize="{DynamicResource StandardFontSize}"
-                           Padding="4,8"
-                           VerticalAlignment="Center"
-                           IsHitTestVisible="False">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
+                        <!-- Search TextBox -->
+                        <TextBox x:Name="SearchTextBox"
+                                 Grid.Column="1"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                 FontSize="{DynamicResource StandardFontSize}"
+                                 Padding="4,8"
+                                 VerticalAlignment="Center"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <!-- Search Placeholder -->
+                        <TextBlock Grid.Column="1"
+                                   Text="🔍 Search tree..."
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="{DynamicResource StandardFontSize}"
+                                   Padding="4,8"
+                                   VerticalAlignment="Center"
+                                   IsHitTestVisible="False">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}"
+                                                     Value="">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <!-- Clear Button -->
+                        <Button Grid.Column="2"
+                                x:Name="ClearButton"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Padding="8"
+                                Content="✖️"
+                                Command="{Binding ClearSearchCommand}"
+                                ToolTip="Clear search">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Visibility"
+                                            Value="Visible"/>
+                                    <Setter Property="Cursor"
+                                            Value="Hand"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}"
+                                                     Value="">
+                                            <Setter Property="Visibility"
+                                                    Value="Collapsed"/>
+                                        </DataTrigger>
+                                        <Trigger Property="DataContext"
+                                                 Value="{x:Null}">
+                                            <Setter Property="Visibility"
+                                                    Value="Collapsed"/>
+                                        </Trigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Text, ElementName=SearchTextBox, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"
+                                                           Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </Border>
+                <!-- TreeView -->
+                <TreeView Grid.Row="1"
+                          x:Name="FilteredTreeView"
+                          ItemsSource="{Binding FilteredItems}"
+                          HorizontalAlignment="Stretch"
+                          MinWidth="200"
+                          VirtualizingPanel.IsVirtualizing="True"
+                          VirtualizingPanel.VirtualizationMode="Recycling">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding DisplayName}"
+                                           Foreground="{DynamicResource PrimaryTextBrush}"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text=": "
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           Margin="2,0"/>
+                                <TextBlock Text="{Binding ValueDisplay}"
+                                           Foreground="{DynamicResource SecondaryTextBrush}"
+                                           FontStyle="Italic"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+
+                <!-- No Results Message -->
+                <Border Grid.Row="1"
+                        Background="{DynamicResource BackgroundBrush}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                    <Border.Style>
+                        <Style TargetType="Border">
                             <Setter Property="Visibility"
                                     Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}"
-                                             Value="">
-                                    <Setter Property="Visibility"
-                                            Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-
-                <!-- Clear Button -->
-                <Button Grid.Column="2"
-                        x:Name="ClearButton"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="8"
-                        Content="✖️"
-                        Command="{Binding ClearSearchCommand}"
-                        ToolTip="Clear search">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Visibility"
-                                    Value="Visible"/>
-                            <Setter Property="Cursor"
-                                    Value="Hand"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}"
-                                             Value="">
-                                    <Setter Property="Visibility"
-                                            Value="Collapsed"/>
-                                </DataTrigger>
-                                <Trigger Property="DataContext"
-                                         Value="{x:Null}">
-                                    <Setter Property="Visibility"
-                                            Value="Collapsed"/>
-                                </Trigger>
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding Text, ElementName=SearchTextBox, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"
-                                                   Value="False"/>
-                                    </MultiDataTrigger.Conditions>
-                                    <Setter Property="Visibility"
-                                            Value="Visible"/>
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </Grid>
-        </Border>
-
-        <!-- TreeView -->
-        <TreeView Grid.Row="1"
-                  x:Name="FilteredTreeView"
-                  ItemsSource="{Binding FilteredItems}"
-                  VirtualizingPanel.IsVirtualizing="True"
-                  VirtualizingPanel.VirtualizationMode="Recycling">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding DisplayName}"
-                                   Foreground="{DynamicResource PrimaryTextBrush}"
-                                   FontWeight="SemiBold"/>
-                        <TextBlock Text=": "
-                                   Foreground="{DynamicResource SecondaryTextBrush}"
-                                   Margin="2,0"/>
-                        <TextBlock Text="{Binding ValueDisplay}"
-                                   Foreground="{DynamicResource SecondaryTextBrush}"
-                                   FontStyle="Italic"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
-
-        <!-- No Results Message -->
-        <Border Grid.Row="1"
-                Background="{DynamicResource BackgroundBrush}"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="Visibility"
-                            Value="Collapsed"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasResults}"
-                                     Value="False">
-                            <Setter Property="Visibility"
-                                    Value="Visible"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <StackPanel Orientation="Vertical"
-                        HorizontalAlignment="Center"
-                        Margin="20">
-                <TextBlock Text="🔍"
-                           FontSize="24"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,8"/>
-                <TextBlock Text="No results found"
-                           Foreground="{DynamicResource SecondaryTextBrush}"
-                           FontSize="{DynamicResource StandardFontSize}"
-                           HorizontalAlignment="Center"
-                           Margin="0,0,0,4"/>
-                <TextBlock Text="{Binding SearchText, StringFormat='for &quot;{0}&quot;'}"
-                           Foreground="{DynamicResource SecondaryTextBrush}"
-                           FontSize="{DynamicResource SmallFontSize}"
-                           HorizontalAlignment="Center">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility"
-                                    Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding SearchText, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"
+                                <DataTrigger Binding="{Binding HasResults}"
                                              Value="False">
                                     <Setter Property="Visibility"
                                             Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </StackPanel>
-        </Border>
-    </Grid>
+                    </Border.Style>
+                    <StackPanel Orientation="Vertical"
+                                HorizontalAlignment="Center"
+                                Margin="20">
+                        <TextBlock Text="🔍"
+                                   FontSize="24"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,8"/>
+                        <TextBlock Text="No results found"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="{DynamicResource StandardFontSize}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding SearchText, StringFormat='for &quot;{0}&quot;'}"
+                                   Foreground="{DynamicResource SecondaryTextBrush}"
+                                   FontSize="{DynamicResource SmallFontSize}"
+                                   HorizontalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SearchText, Converter={StaticResource StringNullOrEmptyToBoolConverter}}"
+                                                     Value="False">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

@@ -40,8 +40,7 @@
                     <Button x:Name="OpenSettingsFolderButton"
                             Content="Open Settings Folder"
                             MinWidth="150"
-                            MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                                       Converter={StaticResource PercentConverter}, ConverterParameter=0.6}"
+                            MaxWidth="250"
                             HorizontalAlignment="Left"
                             Click="OpenSettingsFolderButton_Click"/>
                 </StackPanel>

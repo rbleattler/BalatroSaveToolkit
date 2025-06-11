@@ -9,8 +9,7 @@
                     <Label Content="Theme:"/>
                     <ComboBox x:Name="ThemeComboBox"
                               MinWidth="200"
-                              MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                                         Converter={StaticResource PercentConverter}, ConverterParameter=0.5}"
+                              MaxWidth="300"
                               HorizontalAlignment="Left"
                               Margin="0,5,0,10"
                               SelectionChanged="ThemeComboBox_SelectionChanged"
@@ -34,15 +33,15 @@
                     <Label Content="Default JKR Directory:"/>
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"
+                                              MinWidth="100"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="DefaultJkrDirectoryTextBox"
                                  Grid.Column="0"
-                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.70}"
                                  VerticalAlignment="Center"
-                                 Margin="0,0,5,0"/>
+                                 Margin="0,0,5,0"
+                                 HorizontalAlignment="Stretch"/>
                         <Button x:Name="BrowseJkrDirectoryButton"
                                 Grid.Column="1"
                                 Content="Browse..."
@@ -53,15 +52,15 @@
                     <Label Content="Default Lua Export Directory:"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"
+                                              MinWidth="100"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="DefaultLuaExportDirectoryTextBox"
                                  Grid.Column="0"
-                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.70}"
                                  VerticalAlignment="Center"
-                                 Margin="0,0,5,0"/>
+                                 Margin="0,0,5,0"
+                                 HorizontalAlignment="Stretch"/>
                         <Button x:Name="BrowseLuaExportDirectoryButton"
                                 Grid.Column="1"
                                 Content="Browse..."

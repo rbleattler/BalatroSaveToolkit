@@ -6,5 +6,7 @@
                 Value="{DynamicResource WindowBackgroundBrush}"/>
         <Setter Property="Foreground"
                 Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="MinWidth"
+                Value="{DynamicResource AppMinWidth}"/>
     </Style>
 </ResourceDictionary>

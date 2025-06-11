@@ -10,7 +10,7 @@
         Title="Balatro JKR File Viewer"
         Height="800"
         Width="600"
-        MinWidth="{DynamicResource AppMinWidth}">
+        MinWidth="400">
     <DockPanel>
         <!-- Top toolbar -->
         <StackPanel DockPanel.Dock="Top"
@@ -20,16 +20,14 @@
             <Button x:Name="LoadFileButton"
                     Content="Load JKR File"
                     MinWidth="120"
-                    MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                               Converter={StaticResource PercentConverter}, ConverterParameter=0.3}"
+                    MaxWidth="200"
                     Height="30"
                     Click="LoadFileButton_Click"
                     Margin="0,0,10,0"/>
             <Button x:Name="SaveAsLuaButton"
                     Content="Save as Lua"
                     MinWidth="120"
-                    MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                               Converter={StaticResource PercentConverter}, ConverterParameter=0.3}"
+                    MaxWidth="200"
                     Height="30"
                     Click="SaveAsLuaButton_Click"
                     Margin="0,0,10,0"

@@ -11,15 +11,15 @@
                     <Label Content="Balatro Save Root Directory:"/>
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"
+                                    MinWidth="100"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="InfoBalatroSaveRootTextBox"
                                  Grid.Column="0"
-                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                  VerticalAlignment="Center"
                                  Margin="0,0,5,0"
+                                 HorizontalAlignment="Stretch"
                                  IsReadOnly="True"/>
                     </Grid>
                     <Separator Margin="0,5,0,10"/>
@@ -29,15 +29,15 @@
                            Margin="0,5,0,0"/>
                     <Grid Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"
+                                    MinWidth="100"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="InfoBalatroSettingsFilePathTextBox"
                                  Grid.Column="0"
-                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                  IsReadOnly="True"
-                                 Margin="0,0,5,0"/>
+                                 Margin="0,0,5,0"
+                                 HorizontalAlignment="Stretch"/>
                         <Button x:Name="InfoLoadBalatroSettingsButton"
                                 Grid.Column="1"
                                 Content="Load"
@@ -55,15 +55,15 @@
                            Margin="0,5,0,0"/>
                     <Grid Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"
+                                    MinWidth="100"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="InfoCurrentProfileSettingsPathTextBox"
                                  Grid.Column="0"
-                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                  IsReadOnly="True"
-                                 Margin="0,0,5,0"/>
+                                 Margin="0,0,5,0"
+                                 HorizontalAlignment="Stretch"/>
                         <Button x:Name="InfoLoadProfileSettingsButton"
                                 Grid.Column="1"
                                 Content="Load"
@@ -75,15 +75,15 @@
                            Margin="0,5,0,0"/>
                     <Grid Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"
+                                    MinWidth="100"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="InfoCurrentProfileMetaPathTextBox"
                                  Grid.Column="0"
-                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                  IsReadOnly="True"
-                                 Margin="0,0,5,0"/>
+                                 Margin="0,0,5,0"
+                                 HorizontalAlignment="Stretch"/>
                         <Button x:Name="InfoLoadProfileMetaButton"
                                 Grid.Column="1"
                                 Content="Load"
@@ -95,15 +95,15 @@
                            Margin="0,5,0,0"/>
                     <Grid Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"
+                                    MinWidth="100"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="InfoCurrentProfileSavePathTextBox"
                                  Grid.Column="0"
-                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.8}"
                                  IsReadOnly="True"
-                                 Margin="0,0,5,0"/>
+                                 Margin="0,0,5,0"
+                                 HorizontalAlignment="Stretch"/>
                         <Button x:Name="InfoLoadProfileSaveButton"
                                 Grid.Column="1"
                                 Content="Load"

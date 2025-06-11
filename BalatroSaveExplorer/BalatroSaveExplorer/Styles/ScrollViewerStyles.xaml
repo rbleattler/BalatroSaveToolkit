@@ -5,9 +5,6 @@
                 Value="Transparent"/>
         <Setter Property="Foreground"
                 Value="{DynamicResource PrimaryTextBrush}"/>
-        <!-- Ensure ScrollViewers respect global AppMinWidth -->
-        <Setter Property="MinWidth"
-                Value="{DynamicResource AppMinWidth}"/>
     </Style>
 
 </ResourceDictionary>

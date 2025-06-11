@@ -9,15 +9,15 @@
                     <Label Content="Balatro Save Root Directory:"/>
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"
+                                    MinWidth="100"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBox x:Name="BalatroSaveRootTextBox"
                                  Grid.Column="0"
-                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.75}"
                                  VerticalAlignment="Center"
                                  Margin="0,0,5,0"
+                                 HorizontalAlignment="Stretch"
                                  TextChanged="BalatroSaveRootTextBox_TextChanged"/>
                         <Button x:Name="BrowseBalatroSaveRootButton"
                                 Grid.Column="1"

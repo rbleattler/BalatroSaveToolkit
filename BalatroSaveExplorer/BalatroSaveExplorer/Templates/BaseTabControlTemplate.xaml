@@ -3,7 +3,7 @@
 
     <!-- Base responsive TabControl template -->
     <Style x:Key="BaseResponsiveTabControlStyle"
-            TargetType="TabControl">
+           TargetType="TabControl">
         <Setter Property="OverridesDefaultStyle"
                 Value="True"/>
         <Setter Property="HorizontalAlignment"
@@ -35,7 +35,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="TabControl">
                     <Grid KeyboardNavigation.TabNavigation="Local"
-                            SnapsToDevicePixels="True">
+                          SnapsToDevicePixels="True">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -70,18 +70,16 @@
             </Setter.Value>
         </Setter>
     </Style>
-
     <!-- Nested TabControl style (for Settings sub-tabs) -->
     <Style x:Key="NestedResponsiveTabControlStyle"
-            TargetType="TabControl"
-            BasedOn="{StaticResource BaseResponsiveTabControlStyle}">
+           TargetType="TabControl"
+           BasedOn="{StaticResource BaseResponsiveTabControlStyle}">
         <Setter Property="Margin"
                 Value="5"/>
         <Setter Property="BorderThickness"
                 Value="0,1,0,0"/>
-        <Setter Property="MinWidth"
-                Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                        Converter={StaticResource PercentConverter}, ConverterParameter=0.95}"/>
+        <Setter Property="HorizontalAlignment"
+                Value="Stretch"/>
     </Style>
 
 </ResourceDictionary>

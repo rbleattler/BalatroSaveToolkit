@@ -1,5 +1,8 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:BalatroSaveExplorer.Converters">
+
+    <converters:PercentageConverter x:Key="PercentageConverter"/>
 
     <!-- TreeView TabItem template - for tabs containing TreeView controls -->
     <Style x:Key="TreeViewTabItemStyle"
@@ -64,12 +67,12 @@
     <DataTemplate x:Key="TreeViewTabContentTemplate">
         <Grid Margin="5">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition
+                    Height="*"/>
             </Grid.RowDefinitions>
-
             <TreeView x:Name="DataTreeView"
                       MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
-                                 Converter={StaticResource PercentConverter}, ConverterParameter=0.95}"
+                                 Converter={StaticResource PercentageConverter}, ConverterParameter=0.95}"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch">
                 <TreeView.ItemTemplate>
