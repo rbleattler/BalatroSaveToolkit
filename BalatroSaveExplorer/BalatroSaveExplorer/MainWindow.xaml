@@ -90,25 +90,31 @@
                          x:Name="TreeViewTab">
                     <tabs:TreeViewTab x:Name="TreeViewTabControl"/>
                 </TabItem>
+
+                <!-- Save Management Tab -->
+                <TabItem Header="Saves"
+                         x:Name="SaveViewTab">
+                    <tabs:SaveTab x:Name="SaveTabControl"/>
+                </TabItem>
+
                 <!-- Info Tab -->
                 <TabItem Header="Info"
                          x:Name="InfoTab">
                     <tabs:InfoTab x:Name="InfoTabControl"/>
                 </TabItem>
+
                 <!-- Settings Tab -->
                 <TabItem Header="Settings"
                          x:Name="SettingsTab">
                     <tabs:SettingsTab x:Name="SettingsTabControl"/>
                 </TabItem>
+
                 <!-- File Info Tab -->
                 <TabItem Header="File Info"
                          x:Name="FileInfoTab">
                     <tabs:FileInfoTab x:Name="FileInfoTabControl"/>
                 </TabItem>
-                <TabItem Header="Saves"
-                         x:Name="SaveViewTab">
-                    <tabs:SaveTab x:Name="SaveTabControl"/>
-                </TabItem>
+
             </TabControl>
             <!-- External log panel (initially hidden) -->
             <Border Grid.Row="1"

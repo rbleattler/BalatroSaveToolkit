@@ -7,6 +7,9 @@
                 Value="Stretch"/>
         <Setter Property="Width"
                 Value="Auto"/>
+        <!-- Ensure StackPanels respect global AppMinWidth -->
+        <Setter Property="MinWidth"
+                Value="{DynamicResource AppMinWidth}"/>
     </Style>
 
 </ResourceDictionary>

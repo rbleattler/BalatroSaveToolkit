@@ -1,11 +1,12 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
     <Style TargetType="Grid">
         <Setter Property="Background"
                 Value="{DynamicResource WindowBackgroundBrush}"/>
         <Setter Property="HorizontalAlignment"
                 Value="Stretch"/>
+        <!-- Grids don't need to use global minwidth -->
+
     </Style>
 
 </ResourceDictionary>
