@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="assets\images\" />
+    <Folder Include="Controls\Tabs\SettingsTabs\" />
     <Folder Include="Templates\" />
   </ItemGroup>
   <ItemGroup>

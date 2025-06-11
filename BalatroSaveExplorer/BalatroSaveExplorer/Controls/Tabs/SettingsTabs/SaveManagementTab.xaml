@@ -1,0 +1,27 @@
+<UserControl x:Class="BalatroSaveExplorer.Controls.Tabs.SettingsTabs.SaveManagementTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10">
+            <GroupBox Header="Save Management"
+                      Margin="0,0,0,15">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Save management features will be implemented here."
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10"/>
+                    <TextBlock Text="This could include:"
+                               FontWeight="Bold"
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="• Automatic save backup and restore"
+                               Margin="20,0,0,3"/>
+                    <TextBlock Text="• Save file validation and repair"
+                               Margin="20,0,0,3"/>
+                    <TextBlock Text="• Profile synchronization"
+                               Margin="20,0,0,3"/>
+                    <TextBlock Text="• Save file comparison tools"
+                               Margin="20,0,0,3"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

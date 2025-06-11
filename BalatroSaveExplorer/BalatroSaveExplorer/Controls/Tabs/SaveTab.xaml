@@ -1,0 +1,5 @@
+<UserControl x:Class="BalatroSaveExplorer.Controls.Tabs.SaveTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- TODO: Saves Tab -->
+</UserControl>

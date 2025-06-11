@@ -1,0 +1,36 @@
+<UserControl x:Class="BalatroSaveExplorer.Controls.Tabs.SettingsTabs.LoggingTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10">
+            <GroupBox Header="Log Display"
+                      Margin="0,0,0,15">
+                <StackPanel Margin="10">
+                    <CheckBox x:Name="ShowLogsCheckBox"
+                              Content="Show Debug/Logs Panel"
+                              VerticalAlignment="Center"
+                              Checked="ShowLogsCheckBox_Checked"
+                              Unchecked="ShowLogsCheckBox_Unchecked"
+                              Margin="0,0,0,10"
+                              Foreground="{DynamicResource PrimaryTextBrush}"/>
+                    <CheckBox x:Name="ShowLogsOnStartupCheckBox"
+                              Content="Show logs panel on application startup"
+                              Margin="0,0,0,10"/>
+
+                    <Label Content="Log Level:"/>
+                    <ComboBox x:Name="LogLevelComboBox"
+                              Margin="0,0,0,10">
+                        <ComboBoxItem Content="Debug"/>
+                        <ComboBoxItem Content="Info"/>
+                        <ComboBoxItem Content="Warning"/>
+                        <ComboBoxItem Content="Error"/>
+                    </ComboBox>
+
+                    <Label Content="Maximum Log Entries:"/>
+                    <TextBox x:Name="MaxLogEntriesTextBox"
+                             Margin="0,0,0,10"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

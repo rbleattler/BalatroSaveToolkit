@@ -27,15 +27,37 @@ public partial class SettingsTab : UserControl
   public SettingsTab()
   {
     InitializeComponent();
+
+    // Connect sub-tab event handlers after InitializeComponent
+    Loaded += (s, e) => ConnectSubTabEventHandlers();
   }
 
+  private void ConnectSubTabEventHandlers()
+  {
+    // General Settings Tab
+    GeneralSettingsTabControl.ThemeComboBoxSelectionChanged = ThemeComboBox_SelectionChanged;
+    GeneralSettingsTabControl.BrowseJkrDirectoryButtonClick = BrowseJkrDirectoryButton_Click;
+    GeneralSettingsTabControl.BrowseLuaExportDirectoryButtonClick = BrowseLuaExportDirectoryButton_Click;
+    GeneralSettingsTabControl.BrowseBackupDirectoryButtonClick = BrowseBackupDirectoryButton_Click;
+
+    // Profile Manager Tab
+    ProfileManagerTabControl.BrowseBalatroSaveRootButtonClick = BrowseBalatroSaveRootButton_Click;
+    ProfileManagerTabControl.BalatroSaveRootTextBoxTextChanged = BalatroSaveRootTextBox_TextChanged;
+
+    // Logging Tab
+    LoggingTabControl.ShowLogsCheckBoxChecked = ShowLogsCheckBox_Checked;
+    LoggingTabControl.ShowLogsCheckBoxUnchecked = ShowLogsCheckBox_Unchecked;
+
+    // About Tab
+    AboutTabControl.OpenSettingsFolderButtonClick = OpenSettingsFolderButton_Click;
+  }
   #region Event Handlers
 
   private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
   {
     // Only apply theme change if the selection is from user interaction
     // (not from programmatic loading)
-    if (ThemeComboBox.SelectedItem is ComboBoxItem selectedItem && IsLoaded &&
+    if (GeneralSettingsTabControl.ThemeComboBoxControl.SelectedItem is ComboBoxItem selectedItem && IsLoaded &&
         SettingsUIService != null && WorkingSettings != null)
     {
       SettingsUIService.HandleThemeChange(WorkingSettings, selectedItem, IsLoaded);
@@ -44,24 +66,24 @@ public partial class SettingsTab : UserControl
 
   private void BrowseJkrDirectoryButton_Click(object sender, RoutedEventArgs e)
   {
-    SettingsUIService?.BrowseJkrDirectory(DefaultJkrDirectoryTextBox);
+    SettingsUIService?.BrowseJkrDirectory(GeneralSettingsTabControl.DefaultJkrDirectoryTextBoxControl);
   }
 
   private void BrowseLuaExportDirectoryButton_Click(object sender, RoutedEventArgs e)
   {
-    SettingsUIService?.BrowseLuaExportDirectory(DefaultLuaExportDirectoryTextBox);
+    SettingsUIService?.BrowseLuaExportDirectory(GeneralSettingsTabControl.DefaultLuaExportDirectoryTextBoxControl);
   }
 
   private void BrowseBackupDirectoryButton_Click(object sender, RoutedEventArgs e)
   {
-    SettingsUIService?.BrowseBackupDirectory(BackupDirectoryTextBox);
+    SettingsUIService?.BrowseBackupDirectory(GeneralSettingsTabControl.BackupDirectoryTextBoxControl);
   }
 
   private void BrowseBalatroSaveRootButton_Click(object sender, RoutedEventArgs e)
   {
     if (BrowseBalatroSaveRootCallback != null && UpdateBalatroDerivedPathsCallback != null)
     {
-      BrowseBalatroSaveRootCallback(BalatroSaveRootTextBox.Text, UpdateBalatroDerivedPathsCallback);
+      BrowseBalatroSaveRootCallback(ProfileManagerTabControl.BalatroSaveRootTextBoxControl.Text, UpdateBalatroDerivedPathsCallback);
     }
   }
 
@@ -113,24 +135,15 @@ public partial class SettingsTab : UserControl
   {
     try
     {
-      var settingsPath = SettingsManager.Instance.GetSettingsFilePath();
-      var settingsDirectory = System.IO.Path.GetDirectoryName(settingsPath);
-
-      if (!string.IsNullOrEmpty(settingsDirectory) && System.IO.Directory.Exists(settingsDirectory))
+      var settingsFolder = System.IO.Path.GetDirectoryName(SettingsManager.Instance.GetSettingsFilePath());
+      if (!string.IsNullOrEmpty(settingsFolder))
       {
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-        {
-          FileName = settingsDirectory,
-          UseShellExecute = true,
-          Verb = "open"
-        });
+        System.Diagnostics.Process.Start("explorer.exe", settingsFolder);
       }
     }
     catch (Exception ex)
     {
       Logger?.Log($"Error opening settings folder: {ex.Message}");
-      MessageBox.Show($"Could not open settings folder: {ex.Message}", "Error",
-                     MessageBoxButton.OK, MessageBoxImage.Error);
     }
   }
 
@@ -138,9 +151,9 @@ public partial class SettingsTab : UserControl
   #region Public Properties
 
   /// <summary>
-  /// Gets the BalatroSaveRootTextBox control for external access
+  /// Provides access to the BalatroSaveRootTextBox from the ProfileManager sub-tab
   /// </summary>
-  public TextBox BalatroSaveRootTextBoxControl => BalatroSaveRootTextBox;
+  public TextBox BalatroSaveRootTextBoxControl => ProfileManagerTabControl.BalatroSaveRootTextBoxControl;
 
   #endregion
 
@@ -154,12 +167,20 @@ public partial class SettingsTab : UserControl
     if (SettingsUIService != null && WorkingSettings != null && UpdateBalatroDerivedPathsCallback != null)
     {
       SettingsUIService.LoadSettingsIntoControls(WorkingSettings,
-          DefaultJkrDirectoryTextBox, DefaultLuaExportDirectoryTextBox,
-          ShowLogsOnStartupCheckBox, AutoSaveDecompressedFilesCheckBox,
-          ConfirmFileOverwritesCheckBox, EnableAutoBackupCheckBox,
-          BackupDirectoryTextBox, BalatroSaveRootTextBox, MaxLogEntriesTextBox,
-          EnableFileWatchingCheckBox, FlashTaskbarOnUpdateCheckBox,
-          AutoRefreshOnFileChangeCheckBox, LogLevelComboBox, ThemeComboBox,
+          GeneralSettingsTabControl.DefaultJkrDirectoryTextBoxControl,
+          GeneralSettingsTabControl.DefaultLuaExportDirectoryTextBoxControl,
+          LoggingTabControl.ShowLogsOnStartupCheckBoxControl,
+          GeneralSettingsTabControl.AutoSaveDecompressedFilesCheckBoxControl,
+          GeneralSettingsTabControl.ConfirmFileOverwritesCheckBoxControl,
+          GeneralSettingsTabControl.EnableAutoBackupCheckBoxControl,
+          GeneralSettingsTabControl.BackupDirectoryTextBoxControl,
+          ProfileManagerTabControl.BalatroSaveRootTextBoxControl,
+          LoggingTabControl.MaxLogEntriesTextBoxControl,
+          GeneralSettingsTabControl.EnableFileWatchingCheckBoxControl,
+          GeneralSettingsTabControl.FlashTaskbarOnUpdateCheckBoxControl,
+          GeneralSettingsTabControl.AutoRefreshOnFileChangeCheckBoxControl,
+          LoggingTabControl.LogLevelComboBoxControl,
+          GeneralSettingsTabControl.ThemeComboBoxControl,
           UpdateBalatroDerivedPathsCallback);
     }
   }
@@ -167,24 +188,32 @@ public partial class SettingsTab : UserControl
   /// <summary>
   /// Saves the UI control values back to the working settings
   /// </summary>
-  public void SaveControlsToSettings()
+  private void SaveControlsToSettings()
   {
     if (SettingsUIService != null && WorkingSettings != null)
     {
       SettingsUIService.SaveControlsToSettings(WorkingSettings,
-          DefaultJkrDirectoryTextBox, DefaultLuaExportDirectoryTextBox,
-          ShowLogsOnStartupCheckBox, AutoSaveDecompressedFilesCheckBox,
-          ConfirmFileOverwritesCheckBox, EnableAutoBackupCheckBox,
-          BackupDirectoryTextBox, BalatroSaveRootTextBox, MaxLogEntriesTextBox,
-          EnableFileWatchingCheckBox, FlashTaskbarOnUpdateCheckBox,
-          AutoRefreshOnFileChangeCheckBox, LogLevelComboBox, ThemeComboBox);
+          GeneralSettingsTabControl.DefaultJkrDirectoryTextBoxControl,
+          GeneralSettingsTabControl.DefaultLuaExportDirectoryTextBoxControl,
+          LoggingTabControl.ShowLogsOnStartupCheckBoxControl,
+          GeneralSettingsTabControl.AutoSaveDecompressedFilesCheckBoxControl,
+          GeneralSettingsTabControl.ConfirmFileOverwritesCheckBoxControl,
+          GeneralSettingsTabControl.EnableAutoBackupCheckBoxControl,
+          GeneralSettingsTabControl.BackupDirectoryTextBoxControl,
+          ProfileManagerTabControl.BalatroSaveRootTextBoxControl,
+          LoggingTabControl.MaxLogEntriesTextBoxControl,
+          GeneralSettingsTabControl.EnableFileWatchingCheckBoxControl,
+          GeneralSettingsTabControl.FlashTaskbarOnUpdateCheckBoxControl,
+          GeneralSettingsTabControl.AutoRefreshOnFileChangeCheckBoxControl,
+          LoggingTabControl.LogLevelComboBoxControl,
+          GeneralSettingsTabControl.ThemeComboBoxControl);
     }
   }
 
   /// <summary>
-  /// Applies the working settings to the global settings manager
+  /// Applies the settings changes by calling the SettingsService
   /// </summary>
-  public void ApplySettingsChanges()
+  private void ApplySettingsChanges()
   {
     if (WorkingSettings != null)
     {
@@ -193,19 +222,19 @@ public partial class SettingsTab : UserControl
   }
 
   /// <summary>
-  /// Sets the settings file path for display
+  /// Sets the settings file path for display in the About tab
   /// </summary>
-  public void SetSettingsFilePath(string filePath)
+  public void SetSettingsFilePath(string path)
   {
-    SettingsFilePathTextBox.Text = filePath;
+    AboutTabControl.SetSettingsFilePath(path);
   }
 
   /// <summary>
-  /// Sets the checkbox state for showing logs on startup
+  /// Sets the show logs checkbox state in the Logging tab
   /// </summary>
-  public void SetShowLogsCheckBox(bool isChecked)
+  public void SetShowLogsCheckBoxState(bool isChecked)
   {
-    ShowLogsCheckBox.IsChecked = isChecked;
+    LoggingTabControl.ShowLogsCheckBoxControl.IsChecked = isChecked;
   }
 
   #endregion

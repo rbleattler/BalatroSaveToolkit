@@ -118,7 +118,7 @@ public partial class MainWindow : Window
         // Show logs panel if configured to do so
         if (settings.ShowLogsOnStartup)
         {
-            SettingsTabControl.SetShowLogsCheckBox(true);
+            SettingsTabControl.SetShowLogsCheckBoxState(true);
             LogPanelRow.Height = new GridLength(200);
         }
     }

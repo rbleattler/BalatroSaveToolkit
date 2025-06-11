@@ -1,0 +1,129 @@
+<UserControl x:Class="BalatroSaveExplorer.Controls.Tabs.SettingsTabs.GeneralSettingsTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10">
+            <GroupBox Header="Appearance"
+                      Margin="0,0,0,15">
+                <StackPanel Margin="10">
+                    <Label Content="Theme:"/>
+                    <ComboBox x:Name="ThemeComboBox"
+                              MinWidth="200"
+                              MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                                         Converter={StaticResource PercentConverter}, ConverterParameter=0.5}"
+                              HorizontalAlignment="Left"
+                              Margin="0,5,0,10"
+                              SelectionChanged="ThemeComboBox_SelectionChanged"
+                              SelectedValue="Dark">
+                        <ComboBoxItem Content="Follow System"
+                                      Tag="System"/>
+                        <ComboBoxItem Content="Light"
+                                      Tag="Light"/>
+                        <ComboBoxItem Content="Dark"
+                                      Tag="Dark"/>
+                    </ComboBox>
+                    <TextBlock Text="Changes take effect immediately"
+                               FontSize="11"
+                               Margin="0,0,0,0"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Default Directories"
+                      Margin="0,0,0,15">
+                <StackPanel Margin="10">
+                    <Label Content="Default JKR Directory:"/>
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="DefaultJkrDirectoryTextBox"
+                                 Grid.Column="0"
+                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.75}"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,5,0"/>
+                        <Button x:Name="BrowseJkrDirectoryButton"
+                                Grid.Column="1"
+                                Content="Browse..."
+                                MinWidth="80"
+                                Height="25"
+                                Click="BrowseJkrDirectoryButton_Click"/>
+                    </Grid>
+                    <Label Content="Default Lua Export Directory:"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="DefaultLuaExportDirectoryTextBox"
+                                 Grid.Column="0"
+                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.75}"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,5,0"/>
+                        <Button x:Name="BrowseLuaExportDirectoryButton"
+                                Grid.Column="1"
+                                Content="Browse..."
+                                MinWidth="80"
+                                Height="25"
+                                Click="BrowseLuaExportDirectoryButton_Click"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="File Operations"
+                      Margin="0,0,0,15">
+                <StackPanel Margin="10">
+                    <CheckBox x:Name="AutoSaveDecompressedFilesCheckBox"
+                              Content="Automatically save decompressed files to temp"
+                              Margin="0,0,0,5"/>
+                    <CheckBox x:Name="ConfirmFileOverwritesCheckBox"
+                              Content="Confirm before overwriting existing files"
+                              Margin="0,0,0,5"/>
+                    <CheckBox x:Name="EnableAutoBackupCheckBox"
+                              Content="Enable automatic backup of JKR files before processing"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="File Watching"
+                      Margin="0,0,0,15">
+                <StackPanel Margin="10">
+                    <CheckBox x:Name="EnableFileWatchingCheckBox"
+                              Content="Enable file watching for derived Balatro files"
+                              Margin="0,0,0,5"/>
+                    <CheckBox x:Name="FlashTaskbarOnUpdateCheckBox"
+                              Content="Flash taskbar when watched files are updated"
+                              Margin="0,0,0,5"/>
+                    <CheckBox x:Name="AutoRefreshOnFileChangeCheckBox"
+                              Content="Automatically refresh view when watched files change"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Backup Settings"
+                      Margin="0,0,0,15">
+                <StackPanel Margin="10">
+                    <Label Content="Backup Directory:"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="BackupDirectoryTextBox"
+                                 Grid.Column="0"
+                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.75}"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,5,0"/>
+                        <Button x:Name="BrowseBackupDirectoryButton"
+                                Grid.Column="1"
+                                Content="Browse..."
+                                MinWidth="80"
+                                Height="25"
+                                Click="BrowseBackupDirectoryButton_Click"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

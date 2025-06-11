@@ -1,0 +1,51 @@
+<UserControl x:Class="BalatroSaveExplorer.Controls.Tabs.SettingsTabs.AboutTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10">
+            <GroupBox Header="Application Information"
+                      Margin="0,0,0,15">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Balatro Save Explorer"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="Version 1.0.0"
+                               Margin="0,0,0,5"/>
+                    <TextBlock
+                        Text="A tool for viewing and editing Balatro save files (.jkr)"
+                        TextWrapping="Wrap"
+                        Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Features:"
+                               FontWeight="Bold"
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="• View and navigate JKR file contents"
+                               Margin="20,0,0,3"/>
+                    <TextBlock Text="• Export data to Lua tables for modding"
+                               Margin="20,0,0,3"/>
+                    <TextBlock Text="• File watching and auto-refresh"
+                               Margin="20,0,0,3"/>
+                    <TextBlock Text="• Automatic backup and restore"
+                               Margin="20,0,0,3"/>
+                    <TextBlock Text="• Dark and light theme support"
+                               Margin="20,0,0,15"/>
+
+                    <TextBlock Text="Settings File Location:"
+                               FontWeight="Bold"
+                               Margin="0,5,0,2"/>
+                    <TextBox x:Name="SettingsFilePathTextBox"
+                             IsReadOnly="True"
+                             Margin="0,0,0,10"/>
+                    <Button x:Name="OpenSettingsFolderButton"
+                            Content="Open Settings Folder"
+                            MinWidth="150"
+                            MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
+                                       Converter={StaticResource PercentConverter}, ConverterParameter=0.6}"
+                            HorizontalAlignment="Left"
+                            Click="OpenSettingsFolderButton_Click"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
