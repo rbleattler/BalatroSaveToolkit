@@ -7,10 +7,9 @@ namespace BalatroSaveExplorer.Services;
 /// Handles settings operations that don't involve UI directly.
 /// </summary>
 public static class SettingsService
-{
-    /// <summary>
-    /// Creates a deep copy of the settings object
-    /// </summary>
+{    /// <summary>
+     /// Creates a deep copy of the settings object
+     /// </summary>
     public static AppSettings CloneSettings(AppSettings original)
     {
         return new AppSettings
@@ -28,7 +27,14 @@ public static class SettingsService
             Theme = original.Theme,
             EnableFileWatching = original.EnableFileWatching,
             FlashTaskbarOnUpdate = original.FlashTaskbarOnUpdate,
-            AutoRefreshOnFileChange = original.AutoRefreshOnFileChange
+            AutoRefreshOnFileChange = original.AutoRefreshOnFileChange,
+            // Save management settings
+            EnableAutoSave = original.EnableAutoSave,
+            AutoSaveInterval = original.AutoSaveInterval,
+            AutoSaveIntervalUnit = original.AutoSaveIntervalUnit,
+            EnableSaveRetention = original.EnableSaveRetention,
+            SaveRetentionValue = original.SaveRetentionValue,
+            SaveRetentionUnit = original.SaveRetentionUnit
         };
     }
 
@@ -48,12 +54,18 @@ public static class SettingsService
         settings.MaxLogEntries = workingSettings.MaxLogEntries;
         settings.EnableAutoBackup = workingSettings.EnableAutoBackup;
         settings.BackupDirectory = workingSettings.BackupDirectory;
-        settings.BalatroSaveRoot = workingSettings.BalatroSaveRoot;
-
-        // File watching settings
+        settings.BalatroSaveRoot = workingSettings.BalatroSaveRoot;        // File watching settings
         settings.EnableFileWatching = workingSettings.EnableFileWatching;
         settings.FlashTaskbarOnUpdate = workingSettings.FlashTaskbarOnUpdate;
         settings.AutoRefreshOnFileChange = workingSettings.AutoRefreshOnFileChange;
+
+        // Save management settings
+        settings.EnableAutoSave = workingSettings.EnableAutoSave;
+        settings.AutoSaveInterval = workingSettings.AutoSaveInterval;
+        settings.AutoSaveIntervalUnit = workingSettings.AutoSaveIntervalUnit;
+        settings.EnableSaveRetention = workingSettings.EnableSaveRetention;
+        settings.SaveRetentionValue = workingSettings.SaveRetentionValue;
+        settings.SaveRetentionUnit = workingSettings.SaveRetentionUnit;
 
         // Theme settings
         settings.Theme = workingSettings.Theme;

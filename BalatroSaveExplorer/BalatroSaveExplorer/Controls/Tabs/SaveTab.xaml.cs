@@ -27,8 +27,7 @@ public partial class SaveTab : UserControl
   }
 
   #region Event Handlers
-
-  private void SaveButton_Click(object sender, RoutedEventArgs e)
+  private async void SaveButton_Click(object sender, RoutedEventArgs e)
   {
     try
     {
@@ -38,15 +37,15 @@ public partial class SaveTab : UserControl
         return;
       }
 
-      var result = SaveManagementService.CreateManualBackup();
-      if (result.Success)
+      var success = await SaveManagementService.CreateManualSaveBackupAsync();
+      if (success)
       {
-        MessageBox.Show($"Backup created successfully: {result.BackupFileName}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBox.Show("Backup created successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         RefreshSaveBackupsList();
       }
       else
       {
-        MessageBox.Show($"Failed to create backup: {result.ErrorMessage}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBox.Show("Failed to create backup.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
       }
     }
     catch (Exception ex)
@@ -54,8 +53,7 @@ public partial class SaveTab : UserControl
       MessageBox.Show($"An error occurred while creating backup: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
   }
-
-  private void LoadButton_Click(object sender, RoutedEventArgs e)
+  private async void LoadButton_Click(object sender, RoutedEventArgs e)
   {
     try
     {
@@ -80,15 +78,15 @@ public partial class SaveTab : UserControl
 
       if (confirmResult == MessageBoxResult.Yes)
       {
-        var result = SaveManagementService.RestoreFromBackup(selectedBackup.FilePath);
-        if (result.Success)
+        var success = await SaveManagementService.RestoreSaveBackupAsync(selectedBackup.FilePath);
+        if (success)
         {
           MessageBox.Show("Backup loaded successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
           UpdateCurrentProfileInfo(1, SaveManagementService.GetCurrentSaveFilePath());
         }
         else
         {
-          MessageBox.Show($"Failed to load backup: {result.ErrorMessage}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+          MessageBox.Show("Failed to load backup.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
       }
     }

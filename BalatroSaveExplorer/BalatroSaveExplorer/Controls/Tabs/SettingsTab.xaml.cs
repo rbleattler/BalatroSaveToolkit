@@ -37,15 +37,15 @@ public partial class SettingsTab : UserControl
     GeneralSettingsTabControl.ThemeComboBoxSelectionChanged = ThemeComboBox_SelectionChanged;
     GeneralSettingsTabControl.BrowseJkrDirectoryButtonClick = BrowseJkrDirectoryButton_Click;
     GeneralSettingsTabControl.BrowseLuaExportDirectoryButtonClick = BrowseLuaExportDirectoryButton_Click;
-    GeneralSettingsTabControl.BrowseBackupDirectoryButtonClick = BrowseBackupDirectoryButton_Click;
 
-    // Save management event handlers for General Settings Tab
-    GeneralSettingsTabControl.EnableAutoSaveCheckBoxCheckedChanged = EnableAutoSaveCheckBox_CheckedChanged;
-    GeneralSettingsTabControl.AutoSaveIntervalTextBoxTextChanged = AutoSaveIntervalTextBox_TextChanged;
-    GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxSelectionChanged = AutoSaveIntervalUnitComboBox_SelectionChanged;
-    GeneralSettingsTabControl.EnableSaveRetentionCheckBoxCheckedChanged = EnableSaveRetentionCheckBox_CheckedChanged;
-    GeneralSettingsTabControl.SaveRetentionValueTextBoxTextChanged = SaveRetentionValueTextBox_TextChanged;
-    GeneralSettingsTabControl.SaveRetentionUnitComboBoxSelectionChanged = SaveRetentionUnitComboBox_SelectionChanged;    // Profile Manager Tab
+    // Save Management Tab - wire save management events to this tab instead of General Settings
+    SaveManagementTabControl.BrowseBackupDirectoryButtonClick = BrowseBackupDirectoryButton_Click;
+    SaveManagementTabControl.EnableAutoSaveCheckBoxCheckedChanged = EnableAutoSaveCheckBox_CheckedChanged;
+    SaveManagementTabControl.AutoSaveIntervalTextBoxTextChanged = AutoSaveIntervalTextBox_TextChanged;
+    SaveManagementTabControl.AutoSaveIntervalUnitComboBoxSelectionChanged = AutoSaveIntervalUnitComboBox_SelectionChanged;
+    SaveManagementTabControl.EnableSaveRetentionCheckBoxCheckedChanged = EnableSaveRetentionCheckBox_CheckedChanged;
+    SaveManagementTabControl.SaveRetentionValueTextBoxTextChanged = SaveRetentionValueTextBox_TextChanged;
+    SaveManagementTabControl.SaveRetentionUnitComboBoxSelectionChanged = SaveRetentionUnitComboBox_SelectionChanged;// Profile Manager Tab
     ProfileManagerTabControl.BrowseBalatroSaveRootButtonClick = BrowseBalatroSaveRootButton_Click;
     ProfileManagerTabControl.BalatroSaveRootTextBoxTextChanged = BalatroSaveRootTextBox_TextChanged;
 
@@ -84,10 +84,9 @@ public partial class SettingsTab : UserControl
   {
     SettingsUIService?.BrowseLuaExportDirectory(GeneralSettingsTabControl.DefaultLuaExportDirectoryTextBoxControl);
   }
-
   private void BrowseBackupDirectoryButton_Click(object sender, RoutedEventArgs e)
   {
-    SettingsUIService?.BrowseBackupDirectory(GeneralSettingsTabControl.BackupDirectoryTextBoxControl);
+    SettingsUIService?.BrowseBackupDirectory(SaveManagementTabControl.BackupDirectoryTextBoxControl);
   }
 
   private void BrowseBalatroSaveRootButton_Click(object sender, RoutedEventArgs e)
@@ -106,18 +105,18 @@ public partial class SettingsTab : UserControl
     // Debug mode toggled - could be used to enable additional logging
     var isChecked = sender is CheckBox checkBox && (checkBox.IsChecked ?? false);
     Logger?.Log($"Debug mode {(isChecked ? "enabled" : "disabled")}");
-  }// Save management event handlers
+  }  // Save management event handlers
   private void EnableAutoSaveCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
   {
-    var isEnabled = GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl.IsChecked ?? false;
+    var isEnabled = SaveManagementTabControl.EnableAutoSaveCheckBoxControl.IsChecked ?? false;
     Logger?.Log($"Auto-save {(isEnabled ? "enabled" : "disabled")} - settings will be applied when Apply is clicked");
 
     // Update the SaveManagementService immediately if available to reflect the change
     if (SaveManagementService != null && WorkingSettings != null)
     {
       // Preview the change without saving to settings yet
-      var previewInterval = int.TryParse(GeneralSettingsTabControl.AutoSaveIntervalTextBoxControl.Text, out int interval) ? interval : 5;
-      var previewUnit = (GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Minutes";
+      var previewInterval = int.TryParse(SaveManagementTabControl.AutoSaveIntervalTextBoxControl.Text, out int interval) ? interval : 5;
+      var previewUnit = (SaveManagementTabControl.AutoSaveIntervalUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Minutes";
 
       if (isEnabled && previewInterval > 0)
       {
@@ -125,7 +124,6 @@ public partial class SettingsTab : UserControl
       }
     }
   }
-
   private void AutoSaveIntervalTextBox_TextChanged(object sender, TextChangedEventArgs e)
   {
     var textBox = sender as TextBox;
@@ -135,9 +133,9 @@ public partial class SettingsTab : UserControl
       {
         Logger?.Log("WARNING: Auto-save interval must be greater than 0");
       }
-      else if (interval > 0 && GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl.IsChecked == true)
+      else if (interval > 0 && SaveManagementTabControl.EnableAutoSaveCheckBoxControl.IsChecked == true)
       {
-        var unit = (GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Minutes";
+        var unit = (SaveManagementTabControl.AutoSaveIntervalUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Minutes";
         Logger?.Log($"Auto-save interval updated to {interval} {unit.ToLower()}");
       }
     }
@@ -146,12 +144,11 @@ public partial class SettingsTab : UserControl
       Logger?.Log("WARNING: Auto-save interval must be a valid number");
     }
   }
-
   private void AutoSaveIntervalUnitComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
   {
-    if (GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl.IsChecked == true)
+    if (SaveManagementTabControl.EnableAutoSaveCheckBoxControl.IsChecked == true)
     {
-      var interval = GeneralSettingsTabControl.AutoSaveIntervalTextBoxControl.Text;
+      var interval = SaveManagementTabControl.AutoSaveIntervalTextBoxControl.Text;
       var unit = (sender as ComboBox)?.SelectedItem as ComboBoxItem;
 
       if (int.TryParse(interval, out int intervalValue) && intervalValue > 0 && unit != null)
@@ -160,16 +157,15 @@ public partial class SettingsTab : UserControl
       }
     }
   }
-
   private void EnableSaveRetentionCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
   {
-    var isEnabled = GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl.IsChecked ?? false;
+    var isEnabled = SaveManagementTabControl.EnableSaveRetentionCheckBoxControl.IsChecked ?? false;
     Logger?.Log($"Save retention {(isEnabled ? "enabled" : "disabled")} - settings will be applied when Apply is clicked");
 
     if (isEnabled)
     {
-      var retentionValue = GeneralSettingsTabControl.SaveRetentionValueTextBoxControl.Text;
-      var retentionUnit = (GeneralSettingsTabControl.SaveRetentionUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Days";
+      var retentionValue = SaveManagementTabControl.SaveRetentionValueTextBoxControl.Text;
+      var retentionUnit = (SaveManagementTabControl.SaveRetentionUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Days";
 
       if (int.TryParse(retentionValue, out int value) && value > 0)
       {
@@ -177,7 +173,6 @@ public partial class SettingsTab : UserControl
       }
     }
   }
-
   private void SaveRetentionValueTextBox_TextChanged(object sender, TextChangedEventArgs e)
   {
     var textBox = sender as TextBox;
@@ -187,9 +182,9 @@ public partial class SettingsTab : UserControl
       {
         Logger?.Log("WARNING: Save retention value must be greater than 0");
       }
-      else if (value > 0 && GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl.IsChecked == true)
+      else if (value > 0 && SaveManagementTabControl.EnableSaveRetentionCheckBoxControl.IsChecked == true)
       {
-        var unit = (GeneralSettingsTabControl.SaveRetentionUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Days";
+        var unit = (SaveManagementTabControl.SaveRetentionUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Days";
         Logger?.Log($"Save retention period updated to {value} {unit.ToLower()}");
       }
     }
@@ -198,12 +193,11 @@ public partial class SettingsTab : UserControl
       Logger?.Log("WARNING: Save retention value must be a valid number");
     }
   }
-
   private void SaveRetentionUnitComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
   {
-    if (GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl.IsChecked == true)
+    if (SaveManagementTabControl.EnableSaveRetentionCheckBoxControl.IsChecked == true)
     {
-      var value = GeneralSettingsTabControl.SaveRetentionValueTextBoxControl.Text;
+      var value = SaveManagementTabControl.SaveRetentionValueTextBoxControl.Text;
       var unit = (sender as ComboBox)?.SelectedItem as ComboBoxItem;
 
       if (int.TryParse(value, out int retentionValue) && retentionValue > 0 && unit != null)
@@ -292,9 +286,8 @@ public partial class SettingsTab : UserControl
           GeneralSettingsTabControl.DefaultLuaExportDirectoryTextBoxControl,
           LoggingTabControl.ShowLogsOnStartupCheckBoxControl,
           GeneralSettingsTabControl.AutoSaveDecompressedFilesCheckBoxControl,
-          GeneralSettingsTabControl.ConfirmFileOverwritesCheckBoxControl,
-          GeneralSettingsTabControl.EnableAutoBackupCheckBoxControl,
-          GeneralSettingsTabControl.BackupDirectoryTextBoxControl,
+          GeneralSettingsTabControl.ConfirmFileOverwritesCheckBoxControl, GeneralSettingsTabControl.EnableAutoBackupCheckBoxControl,
+          SaveManagementTabControl.BackupDirectoryTextBoxControl,
           ProfileManagerTabControl.BalatroSaveRootTextBoxControl,
           LoggingTabControl.MaxLogEntriesTextBoxControl,
           GeneralSettingsTabControl.EnableFileWatchingCheckBoxControl,
@@ -304,12 +297,12 @@ public partial class SettingsTab : UserControl
           GeneralSettingsTabControl.ThemeComboBoxControl,
           UpdateBalatroDerivedPathsCallback,
           // Save management controls
-          GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl,
-          GeneralSettingsTabControl.AutoSaveIntervalTextBoxControl,
-          GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxControl,
-          GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl,
-          GeneralSettingsTabControl.SaveRetentionValueTextBoxControl,
-          GeneralSettingsTabControl.SaveRetentionUnitComboBoxControl);      // Update save management tab with current profile info
+          SaveManagementTabControl.EnableAutoSaveCheckBoxControl,
+          SaveManagementTabControl.AutoSaveIntervalTextBoxControl,
+          SaveManagementTabControl.AutoSaveIntervalUnitComboBoxControl,
+          SaveManagementTabControl.EnableSaveRetentionCheckBoxControl,
+          SaveManagementTabControl.SaveRetentionValueTextBoxControl,
+          SaveManagementTabControl.SaveRetentionUnitComboBoxControl);// Update save management tab with current profile info
       SaveManagementTabControl.UpdateCurrentProfileInfo(WorkingSettings.CurrentProfileNumber, WorkingSettings.CurrentProfileSavePath);
     }
   }
@@ -325,9 +318,8 @@ public partial class SettingsTab : UserControl
           GeneralSettingsTabControl.DefaultLuaExportDirectoryTextBoxControl,
           LoggingTabControl.ShowLogsOnStartupCheckBoxControl,
           GeneralSettingsTabControl.AutoSaveDecompressedFilesCheckBoxControl,
-          GeneralSettingsTabControl.ConfirmFileOverwritesCheckBoxControl,
-          GeneralSettingsTabControl.EnableAutoBackupCheckBoxControl,
-          GeneralSettingsTabControl.BackupDirectoryTextBoxControl,
+          GeneralSettingsTabControl.ConfirmFileOverwritesCheckBoxControl, GeneralSettingsTabControl.EnableAutoBackupCheckBoxControl,
+          SaveManagementTabControl.BackupDirectoryTextBoxControl,
           ProfileManagerTabControl.BalatroSaveRootTextBoxControl,
           LoggingTabControl.MaxLogEntriesTextBoxControl,
           GeneralSettingsTabControl.EnableFileWatchingCheckBoxControl,
@@ -336,12 +328,12 @@ public partial class SettingsTab : UserControl
           LoggingTabControl.LogLevelComboBoxControl,
           GeneralSettingsTabControl.ThemeComboBoxControl,
           // Save management controls
-          GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl,
-          GeneralSettingsTabControl.AutoSaveIntervalTextBoxControl,
-          GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxControl,
-          GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl,
-          GeneralSettingsTabControl.SaveRetentionValueTextBoxControl,
-          GeneralSettingsTabControl.SaveRetentionUnitComboBoxControl);
+          SaveManagementTabControl.EnableAutoSaveCheckBoxControl,
+          SaveManagementTabControl.AutoSaveIntervalTextBoxControl,
+          SaveManagementTabControl.AutoSaveIntervalUnitComboBoxControl,
+          SaveManagementTabControl.EnableSaveRetentionCheckBoxControl,
+          SaveManagementTabControl.SaveRetentionValueTextBoxControl,
+          SaveManagementTabControl.SaveRetentionUnitComboBoxControl);
     }
   }
 

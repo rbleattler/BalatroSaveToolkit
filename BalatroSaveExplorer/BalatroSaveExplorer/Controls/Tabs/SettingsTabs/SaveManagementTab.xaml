@@ -3,77 +3,87 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="10">
-            <!-- Save Management Information -->
-            <GroupBox Header="Save Management"
+            <!-- Backup Settings -->
+            <GroupBox Header="Backup Settings"
                       Margin="0,0,0,15">
                 <StackPanel Margin="10">
-                    <TextBlock Text="Save Management Features"
-                               FontSize="16"
-                               FontWeight="Bold"
-                               Margin="0,0,0,10"/>
+                    <Label Content="Backup Directory:"/>
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="BackupDirectoryTextBox"
+                                 Grid.Column="0"
+                                 MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid},
+                                            Converter={StaticResource PercentConverter}, ConverterParameter=0.70}"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,5,0"/>
+                        <Button x:Name="BrowseBackupDirectoryButton"
+                                Grid.Column="1"
+                                Content="Browse..."
+                                MinWidth="80"
+                                Height="25"
+                                Click="BrowseBackupDirectoryButton_Click"/>
+                    </Grid>
 
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,10">
-                        <Run Text="Save management settings have been moved to better organize the interface:"/>
-                    </TextBlock>
-
-                    <StackPanel Margin="20,0,0,15">
-                        <TextBlock Margin="0,5,0,0">
-                            <Run Text="•"
-                                    FontWeight="Bold"/>
-                            <Run Text="Auto-save settings"/>
-                            <Run Text=" - Configure automatic backup intervals in the "/>
-                            <Run Text="General"
-                                    FontWeight="Bold"/>
-                            <Run Text=" tab"/>
-                        </TextBlock>
-
-                        <TextBlock Margin="0,5,0,0">
-                            <Run Text="•"
-                                    FontWeight="Bold"/>
-                            <Run Text="Manual save management"/>
-                            <Run Text=" - Create, load, and manage backups in the main "/>
-                            <Run Text="Saves"
-                                    FontWeight="Bold"/>
-                            <Run Text=" tab"/>
-                        </TextBlock>
-
-                        <TextBlock Margin="0,5,0,0">
-                            <Run Text="•"
-                                    FontWeight="Bold"/>
-                            <Run Text="Backup directory settings"/>
-                            <Run Text=" - Configure backup location in the "/>
-                            <Run Text="General"
-                                    FontWeight="Bold"/>
-                            <Run Text=" tab"/>
-                        </TextBlock>
+                    <!-- Auto Save Settings -->
+                    <CheckBox x:Name="EnableAutoSaveCheckBox"
+                              Content="Auto Save every"
+                              Margin="0,5,0,5"
+                              Checked="EnableAutoSaveCheckBox_CheckedChanged"
+                              Unchecked="EnableAutoSaveCheckBox_CheckedChanged"/>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="20,0,0,10"
+                                IsEnabled="{Binding IsChecked, ElementName=EnableAutoSaveCheckBox}">
+                        <TextBox x:Name="AutoSaveIntervalTextBox"
+                                 Width="60"
+                                 Height="25"
+                                 VerticalAlignment="Center"
+                                 Text="5"
+                                 Margin="0,0,5,0"
+                                 TextChanged="AutoSaveIntervalTextBox_TextChanged"/>
+                        <ComboBox x:Name="AutoSaveIntervalUnitComboBox"
+                                  Width="80"
+                                  Height="25"
+                                  VerticalAlignment="Center"
+                                  SelectionChanged="AutoSaveIntervalUnitComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Seconds"/>
+                            <ComboBoxItem Content="Minutes"
+                                          IsSelected="True"/>
+                            <ComboBoxItem Content="Hours"/>
+                            <ComboBoxItem Content="Days"/>
+                        </ComboBox>
                     </StackPanel>
-                </StackPanel>
-            </GroupBox>
 
-            <!-- Quick Access -->
-            <GroupBox Header="Quick Access"
-                      Margin="0,0,0,15">
-                <StackPanel Margin="10">
-                    <TextBlock Text="For your convenience:"
-                               FontWeight="Bold"
-                               Margin="0,0,0,10"/>
-
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,10">
-                        <Run Text="Visit the "/>
-                        <Run Text="General"
-                                FontWeight="Bold"/>
-                        <Run Text=" tab to configure automatic backup settings, including backup frequency and retention policies."/>
-                    </TextBlock>
-
-                    <TextBlock TextWrapping="Wrap"
-                               Margin="0,0,0,10">
-                        <Run Text="Visit the main "/>
-                        <Run Text="Saves"
-                                FontWeight="Bold"/>
-                        <Run Text=" tab to manually create backups, restore saves, and manage your backup collection."/>
-                    </TextBlock>
+                    <!-- Save Retention Settings -->
+                    <CheckBox x:Name="EnableSaveRetentionCheckBox"
+                              Content="Delete older than"
+                              Margin="0,5,0,5"
+                              Checked="EnableSaveRetentionCheckBox_CheckedChanged"
+                              Unchecked="EnableSaveRetentionCheckBox_CheckedChanged"/>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="20,0,0,5"
+                                IsEnabled="{Binding IsChecked, ElementName=EnableSaveRetentionCheckBox}">
+                        <TextBox x:Name="SaveRetentionValueTextBox"
+                                 Width="60"
+                                 Height="25"
+                                 VerticalAlignment="Center"
+                                 Text="7"
+                                 Margin="0,0,5,0"
+                                 TextChanged="SaveRetentionValueTextBox_TextChanged"/>
+                        <ComboBox x:Name="SaveRetentionUnitComboBox"
+                                  Width="80"
+                                  Height="25"
+                                  VerticalAlignment="Center"
+                                  SelectionChanged="SaveRetentionUnitComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Hours"/>
+                            <ComboBoxItem Content="Days"
+                                          IsSelected="True"/>
+                            <ComboBoxItem Content="Weeks"/>
+                            <ComboBoxItem Content="Months"/>
+                        </ComboBox>
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
 

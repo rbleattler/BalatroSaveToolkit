@@ -5,6 +5,9 @@
                 Value="{DynamicResource WindowBackgroundBrush}"/>
         <Setter Property="HorizontalAlignment"
                 Value="Stretch"/>
+        <!-- <Setter Property="MinWidth"
+                Value="{DynamicResource AppMinWidth*0.35}"/> -->
+
         <!-- Grids don't need to use global minwidth -->
 
     </Style>

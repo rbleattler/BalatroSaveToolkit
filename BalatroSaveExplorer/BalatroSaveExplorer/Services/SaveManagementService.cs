@@ -112,7 +112,6 @@ public class SaveManagementService : IDisposable
       return false;
     }
   }
-
   /// <summary>
   /// Creates a manual backup and returns the result
   /// </summary>
@@ -134,8 +133,7 @@ public class SaveManagementService : IDisposable
       var backupName = $"P{_settings.CurrentProfileNumber}_{timestamp}_manual.jkr";
 
       var task = _backupService.CreateBackupAsync(currentSavePath, backupName);
-      task.Wait();
-      var backupPath = task.Result;
+      var backupPath = task.ConfigureAwait(false).GetAwaiter().GetResult();
 
       SaveBackupCreated?.Invoke(this, backupPath);
       SaveListUpdated?.Invoke(this, EventArgs.Empty);
@@ -191,7 +189,6 @@ public class SaveManagementService : IDisposable
       return false;
     }
   }
-
   /// <summary>
   /// Restores a backup and returns the result
   /// </summary>
@@ -206,13 +203,12 @@ public class SaveManagementService : IDisposable
       {
         var preRestoreBackupName = $"P{_settings.CurrentProfileNumber}_pre_restore_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.jkr";
         var backupTask = _backupService.CreateBackupAsync(currentSavePath, preRestoreBackupName);
-        backupTask.Wait();
+        backupTask.ConfigureAwait(false).GetAwaiter().GetResult();
       }
 
       // Restore the backup
       var restoreTask = _backupService.RestoreBackupAsync(backupFilePath, currentSavePath);
-      restoreTask.Wait();
-      var success = restoreTask.Result;
+      var success = restoreTask.ConfigureAwait(false).GetAwaiter().GetResult();
 
       if (success)
       {
@@ -391,6 +387,7 @@ public class SaveManagementService : IDisposable
   {
     return unit.ToLower() switch
     {
+      "seconds" => value * 1000,
       "minutes" => value * 60 * 1000,
       "hours" => value * 60 * 60 * 1000,
       "days" => value * 24 * 60 * 60 * 1000,

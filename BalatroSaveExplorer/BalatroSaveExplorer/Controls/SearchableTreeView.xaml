@@ -68,6 +68,7 @@
                         Background="Transparent"
                         BorderThickness="0"
                         Padding="8"
+                        Content="✖️"
                         Command="{Binding ClearSearchCommand}"
                         ToolTip="Clear search">
                     <Button.Style>
@@ -98,10 +99,6 @@
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
-                    <!-- text ✖️ -->
-                    <TextBlock Text="✖️"
-                               Foreground="{DynamicResource PrimaryTextBrush}"
-                               FontSize="{DynamicResource StandardFontSize}"/>
                 </Button>
             </Grid>
         </Border>

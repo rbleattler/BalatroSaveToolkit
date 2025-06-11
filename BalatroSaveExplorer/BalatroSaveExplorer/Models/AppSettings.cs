@@ -224,7 +224,7 @@ public class AppSettings : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Auto save interval unit (Minutes, Hours, Days)
+    /// Auto save interval unit (Seconds, Minutes, Hours, Days)
     /// </summary>
     public string AutoSaveIntervalUnit
     {
