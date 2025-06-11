@@ -19,11 +19,9 @@ public class SettingsUIService
     public SettingsUIService(Logger logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
-    /// <summary>
-    /// Loads the working settings into the UI controls
-    /// </summary>
+    }    /// <summary>
+         /// Loads the working settings into the UI controls
+         /// </summary>
     public void LoadSettingsIntoControls(AppSettings workingSettings,
         TextBox defaultJkrDirectoryTextBox,
         TextBox defaultLuaExportDirectoryTextBox,
@@ -39,7 +37,14 @@ public class SettingsUIService
         CheckBox autoRefreshOnFileChangeCheckBox,
         ComboBox logLevelComboBox,
         ComboBox themeComboBox,
-        Action updateBalatroDerivedPaths)
+        Action updateBalatroDerivedPaths,
+        // Save management controls
+        CheckBox? enableAutoSaveCheckBox = null,
+        TextBox? autoSaveIntervalTextBox = null,
+        ComboBox? autoSaveIntervalUnitComboBox = null,
+        CheckBox? enableSaveRetentionCheckBox = null,
+        TextBox? saveRetentionValueTextBox = null,
+        ComboBox? saveRetentionUnitComboBox = null)
     {
         defaultJkrDirectoryTextBox.Text = workingSettings.DefaultJkrDirectory;
         defaultLuaExportDirectoryTextBox.Text = workingSettings.DefaultLuaExportDirectory;
@@ -55,6 +60,41 @@ public class SettingsUIService
         enableFileWatchingCheckBox.IsChecked = workingSettings.EnableFileWatching;
         flashTaskbarOnUpdateCheckBox.IsChecked = workingSettings.FlashTaskbarOnUpdate;
         autoRefreshOnFileChangeCheckBox.IsChecked = workingSettings.AutoRefreshOnFileChange;
+
+        // Save management settings
+        if (enableAutoSaveCheckBox != null)
+            enableAutoSaveCheckBox.IsChecked = workingSettings.EnableAutoSave;
+        if (autoSaveIntervalTextBox != null)
+            autoSaveIntervalTextBox.Text = workingSettings.AutoSaveInterval.ToString();
+        if (enableSaveRetentionCheckBox != null)
+            enableSaveRetentionCheckBox.IsChecked = workingSettings.EnableSaveRetention;
+        if (saveRetentionValueTextBox != null)
+            saveRetentionValueTextBox.Text = workingSettings.SaveRetentionValue.ToString();
+
+        // Set combobox selections
+        if (autoSaveIntervalUnitComboBox != null)
+        {
+            foreach (ComboBoxItem item in autoSaveIntervalUnitComboBox.Items)
+            {
+                if (item.Content.ToString() == workingSettings.AutoSaveIntervalUnit)
+                {
+                    autoSaveIntervalUnitComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+        }
+
+        if (saveRetentionUnitComboBox != null)
+        {
+            foreach (ComboBoxItem item in saveRetentionUnitComboBox.Items)
+            {
+                if (item.Content.ToString() == workingSettings.SaveRetentionUnit)
+                {
+                    saveRetentionUnitComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+        }
 
         // Set the log level combobox
         foreach (ComboBoxItem item in logLevelComboBox.Items)
@@ -78,11 +118,9 @@ public class SettingsUIService
 
         // Update derived path displays
         updateBalatroDerivedPaths();
-    }
-
-    /// <summary>
-    /// Saves the UI control values back to the working settings
-    /// </summary>
+    }    /// <summary>
+         /// Saves the UI control values back to the working settings
+         /// </summary>
     public void SaveControlsToSettings(AppSettings workingSettings,
         TextBox defaultJkrDirectoryTextBox,
         TextBox defaultLuaExportDirectoryTextBox,
@@ -97,7 +135,14 @@ public class SettingsUIService
         CheckBox flashTaskbarOnUpdateCheckBox,
         CheckBox autoRefreshOnFileChangeCheckBox,
         ComboBox logLevelComboBox,
-        ComboBox themeComboBox)
+        ComboBox themeComboBox,
+        // Save management controls
+        CheckBox? enableAutoSaveCheckBox = null,
+        TextBox? autoSaveIntervalTextBox = null,
+        ComboBox? autoSaveIntervalUnitComboBox = null,
+        CheckBox? enableSaveRetentionCheckBox = null,
+        TextBox? saveRetentionValueTextBox = null,
+        ComboBox? saveRetentionUnitComboBox = null)
     {
         workingSettings.DefaultJkrDirectory = defaultJkrDirectoryTextBox.Text;
         workingSettings.DefaultLuaExportDirectory = defaultLuaExportDirectoryTextBox.Text;
@@ -112,6 +157,32 @@ public class SettingsUIService
         workingSettings.EnableFileWatching = enableFileWatchingCheckBox.IsChecked ?? true;
         workingSettings.FlashTaskbarOnUpdate = flashTaskbarOnUpdateCheckBox.IsChecked ?? true;
         workingSettings.AutoRefreshOnFileChange = autoRefreshOnFileChangeCheckBox.IsChecked ?? true;
+
+        // Save management settings
+        if (enableAutoSaveCheckBox != null)
+            workingSettings.EnableAutoSave = enableAutoSaveCheckBox.IsChecked ?? false;
+        if (enableSaveRetentionCheckBox != null)
+            workingSettings.EnableSaveRetention = enableSaveRetentionCheckBox.IsChecked ?? true;
+
+        if (autoSaveIntervalTextBox != null && int.TryParse(autoSaveIntervalTextBox.Text, out int autoSaveInterval))
+        {
+            workingSettings.AutoSaveInterval = autoSaveInterval;
+        }
+
+        if (saveRetentionValueTextBox != null && int.TryParse(saveRetentionValueTextBox.Text, out int saveRetentionValue))
+        {
+            workingSettings.SaveRetentionValue = saveRetentionValue;
+        }
+
+        if (autoSaveIntervalUnitComboBox?.SelectedItem is ComboBoxItem autoSaveUnitItem)
+        {
+            workingSettings.AutoSaveIntervalUnit = autoSaveUnitItem.Content.ToString() ?? "Minutes";
+        }
+
+        if (saveRetentionUnitComboBox?.SelectedItem is ComboBoxItem saveRetentionUnitItem)
+        {
+            workingSettings.SaveRetentionUnit = saveRetentionUnitItem.Content.ToString() ?? "Days";
+        }
 
         if (int.TryParse(maxLogEntriesTextBox.Text, out int maxLogEntries))
         {

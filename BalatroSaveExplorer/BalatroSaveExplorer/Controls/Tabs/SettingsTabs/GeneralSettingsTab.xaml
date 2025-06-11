@@ -99,12 +99,11 @@
                               Content="Automatically refresh view when watched files change"/>
                 </StackPanel>
             </GroupBox>
-
             <GroupBox Header="Backup Settings"
                       Margin="0,0,0,15">
                 <StackPanel Margin="10">
                     <Label Content="Backup Directory:"/>
-                    <Grid>
+                    <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -122,6 +121,63 @@
                                 Height="25"
                                 Click="BrowseBackupDirectoryButton_Click"/>
                     </Grid>
+
+                    <!-- Auto Save Settings -->
+                    <CheckBox x:Name="EnableAutoSaveCheckBox"
+                              Content="Auto Save every"
+                              Margin="0,5,0,5"
+                              Checked="EnableAutoSaveCheckBox_CheckedChanged"
+                              Unchecked="EnableAutoSaveCheckBox_CheckedChanged"/>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="20,0,0,10"
+                                IsEnabled="{Binding IsChecked, ElementName=EnableAutoSaveCheckBox}">
+                        <TextBox x:Name="AutoSaveIntervalTextBox"
+                                 Width="60"
+                                 Height="25"
+                                 VerticalAlignment="Center"
+                                 Text="5"
+                                 Margin="0,0,5,0"
+                                 TextChanged="AutoSaveIntervalTextBox_TextChanged"/>
+                        <ComboBox x:Name="AutoSaveIntervalUnitComboBox"
+                                  Width="80"
+                                  Height="25"
+                                  VerticalAlignment="Center"
+                                  SelectionChanged="AutoSaveIntervalUnitComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Minutes"
+                                    IsSelected="True"/>
+                            <ComboBoxItem Content="Hours"/>
+                            <ComboBoxItem Content="Days"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Save Retention Settings -->
+                    <CheckBox x:Name="EnableSaveRetentionCheckBox"
+                              Content="Delete older than"
+                              Margin="0,5,0,5"
+                              Checked="EnableSaveRetentionCheckBox_CheckedChanged"
+                              Unchecked="EnableSaveRetentionCheckBox_CheckedChanged"/>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="20,0,0,5"
+                                IsEnabled="{Binding IsChecked, ElementName=EnableSaveRetentionCheckBox}">
+                        <TextBox x:Name="SaveRetentionValueTextBox"
+                                 Width="60"
+                                 Height="25"
+                                 VerticalAlignment="Center"
+                                 Text="7"
+                                 Margin="0,0,5,0"
+                                 TextChanged="SaveRetentionValueTextBox_TextChanged"/>
+                        <ComboBox x:Name="SaveRetentionUnitComboBox"
+                                  Width="80"
+                                  Height="25"
+                                  VerticalAlignment="Center"
+                                  SelectionChanged="SaveRetentionUnitComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Hours"/>
+                            <ComboBoxItem Content="Days"
+                                    IsSelected="True"/>
+                            <ComboBoxItem Content="Weeks"/>
+                            <ComboBoxItem Content="Months"/>
+                        </ComboBox>
+                    </StackPanel>
                 </StackPanel>
             </GroupBox>
         </StackPanel>

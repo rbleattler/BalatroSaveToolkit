@@ -107,6 +107,7 @@
                 </TabItem>
                 <TabItem Header="Saves"
                          x:Name="SaveViewTab">
+                    <tabs:SaveTab x:Name="SaveTabControl"/>
                 </TabItem>
             </TabControl>
             <!-- External log panel (initially hidden) -->

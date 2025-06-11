@@ -20,8 +20,7 @@ namespace BalatroSaveExplorer;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : Window
-{
-    // Services
+{    // Services
     private readonly Logger _logger;
     private readonly JkrFileService _jkrFileService;
     private readonly BackupService _backupService;
@@ -32,6 +31,7 @@ public partial class MainWindow : Window
     private readonly SettingsUIService _settingsUIService;
     private readonly BalatroPathService _balatroPathService;
     private readonly FileChangeHandlerService _fileChangeHandlerService;
+    private readonly SaveManagementService _saveManagementService;
 
     // UI-specific fields only
     private string? _currentFilePath;
@@ -45,9 +45,7 @@ public partial class MainWindow : Window
 
     public MainWindow()
     {
-        InitializeComponent();
-
-        // Initialize logger first
+        InitializeComponent();        // Initialize logger first
         _logger = new Logger();        // Initialize services
         _jkrFileService = new JkrFileService(_logger);
         _backupService = new BackupService(_logger);
@@ -59,20 +57,20 @@ public partial class MainWindow : Window
         _balatroPathService = new BalatroPathService(_logger);
         _fileChangeHandlerService = new FileChangeHandlerService(_logger, _uiStateService);
 
-        // Subscribe to logger events
-        _logger.LogAdded += OnLogAdded;        // Subscribe to service events
-        _fileWatchingService.FileChanged += OnFileWatchingService_FileChanged;        // Initialize settings
+        // Initialize settings first, then SaveManagementService
         _workingSettings = SettingsService.CloneSettings(SettingsManager.Instance.Settings);
+        _saveManagementService = new SaveManagementService(_logger, _backupService, SettingsManager.Instance.Settings);        // Subscribe to logger events
+        _logger.LogAdded += OnLogAdded;        // Subscribe to service events
+        _fileWatchingService.FileChanged += OnFileWatchingService_FileChanged;
 
         // Set up InfoTab callbacks
         InfoTabControl.LoadFileCallback = LoadFile;
-        InfoTabControl.SwitchToTreeViewTabCallback = () => MainTabControl.SelectedItem = TreeViewTab;
-
-        // Set up SettingsTab callbacks and dependencies
+        InfoTabControl.SwitchToTreeViewTabCallback = () => MainTabControl.SelectedItem = TreeViewTab;        // Set up SettingsTab callbacks and dependencies
         SettingsTabControl.SettingsUIService = _settingsUIService;
         SettingsTabControl.Logger = _logger;
         SettingsTabControl.LogPanelRow = LogPanelRow;
         SettingsTabControl.WorkingSettings = _workingSettings;
+        SettingsTabControl.SaveManagementService = _saveManagementService;
         SettingsTabControl.ApplySettingsCallback = (settings, saveControls, applyChanges, getSettings, setSettings) =>
         {
             _settingsUIService.ApplySettings(saveControls, applyChanges, getSettings, setSettings);
@@ -86,11 +84,14 @@ public partial class MainWindow : Window
             _settingsUIService.BrowseBalatroSaveRoot(SettingsTabControl.BalatroSaveRootTextBoxControl, updateCallback);
         };
         SettingsTabControl.UpdateBalatroDerivedPathsCallback = UpdateBalatroDerivedPaths; SettingsTabControl.ShowLogPanelCallback = (logPanelRow, logger) => LogPanelManager.ShowLogPanel(logPanelRow, logger);
-        SettingsTabControl.HideLogPanelCallback = (logPanelRow, logger) => LogPanelManager.HideLogPanel(logPanelRow, logger);
-
-        // Set the settings file path for display and load settings into controls
+        SettingsTabControl.HideLogPanelCallback = (logPanelRow, logger) => LogPanelManager.HideLogPanel(logPanelRow, logger);        // Set the settings file path for display and load settings into controls
         SettingsTabControl.SetSettingsFilePath(SettingsManager.Instance.GetSettingsFilePath());
         SettingsTabControl.LoadSettingsIntoControls();
+
+        // Set up SaveTab with SaveManagementService
+        SaveTabControl.SaveManagementService = _saveManagementService;
+        SaveTabControl.UpdateCurrentProfileInfo(1, _saveManagementService.GetCurrentSaveFilePath());
+        SaveTabControl.RefreshSaveBackupsList();
 
         // Apply settings on startup
         ApplySettings();
@@ -213,17 +214,19 @@ public partial class MainWindow : Window
     {
         LogPanelManager.HandleLogAdded(LogTextBox, logMessage, Dispatcher);
     }
-
     protected override void OnClosed(EventArgs e)
     {
         // Clean up file watching resources
         _fileWatchingService.StopWatching();
 
+        // Clean up save management service
+        _saveManagementService.Dispose();
+
         _logger.SaveToFile();
         base.OnClosed(e);
-    }    /// <summary>
-         /// Handles file change events from the file watching service
-         /// </summary>
+    }/// <summary>
+     /// Handles file change events from the file watching service
+     /// </summary>
     private void OnFileWatchingService_FileChanged(object? sender, string filePath)
     {
         _fileChangeHandlerService.HandleFileChange(filePath, _currentFilePath, LoadFile, Dispatcher);

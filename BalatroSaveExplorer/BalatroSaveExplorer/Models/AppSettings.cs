@@ -24,12 +24,18 @@ public class AppSettings : INotifyPropertyChanged
     private bool _enableAutoBackup = true;
 
     // Theme settings
-    private AppTheme _theme = AppTheme.System;
-
-    // File watching settings
+    private AppTheme _theme = AppTheme.System;    // File watching settings
     private bool _enableFileWatching = true;
     private bool _flashTaskbarOnUpdate = true;
     private bool _autoRefreshOnFileChange = true;
+
+    // Save management settings
+    private bool _enableAutoSave = false;
+    private int _autoSaveInterval = 5;
+    private string _autoSaveIntervalUnit = "Minutes";
+    private bool _enableSaveRetention = true;
+    private int _saveRetentionValue = 7;
+    private string _saveRetentionUnit = "Days";
 
     /// <summary>
     /// Default directory for opening JKR files
@@ -155,18 +161,19 @@ public class AppSettings : INotifyPropertyChanged
     /// <summary>
     /// Path to current profile's settings file (derived)
     /// </summary>
-    public string CurrentProfileSettingsPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "profile.jkr");
+    public string CurrentProfileSettingsPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "profile.jkr");    /// <summary>
+                                                                                                                                  /// Path to current profile's meta file (derived)
+                                                                                                                                  /// </summary>
+    public string CurrentProfileMetaPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "meta.jkr");
 
     /// <summary>
-    /// Path to current profile's meta file (derived)
+    /// Path to current profile's save file (derived)
     /// </summary>
-    public string CurrentProfileMetaPath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "meta.jkr");    /// <summary>
-                                                                                                                           /// Path to current profile's save file (derived)
-                                                                                                                           /// </summary>    public string CurrentProfileSavePath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "save.jkr");
+    public string CurrentProfileSavePath => Path.Combine(BalatroSaveRoot, CurrentProfileNumber.ToString(), "save.jkr");
 
-                                                                                                                           /// <summary>
-                                                                                                                           /// Application theme setting
-                                                                                                                           /// </summary>
+    /// <summary>
+    /// Application theme setting
+    /// </summary>
     public AppTheme Theme
     {
         get => _theme;
@@ -189,15 +196,67 @@ public class AppSettings : INotifyPropertyChanged
     {
         get => _flashTaskbarOnUpdate;
         set => SetProperty(ref _flashTaskbarOnUpdate, value);
-    }
-
-    /// <summary>
-    /// Whether to automatically refresh the view when watched files change
-    /// </summary>
+    }    /// <summary>
+         /// Whether to automatically refresh the view when watched files change
+         /// </summary>
     public bool AutoRefreshOnFileChange
     {
         get => _autoRefreshOnFileChange;
         set => SetProperty(ref _autoRefreshOnFileChange, value);
+    }
+
+    /// <summary>
+    /// Whether to enable automatic save backups
+    /// </summary>
+    public bool EnableAutoSave
+    {
+        get => _enableAutoSave;
+        set => SetProperty(ref _enableAutoSave, value);
+    }
+
+    /// <summary>
+    /// Auto save interval value
+    /// </summary>
+    public int AutoSaveInterval
+    {
+        get => _autoSaveInterval;
+        set => SetProperty(ref _autoSaveInterval, value);
+    }
+
+    /// <summary>
+    /// Auto save interval unit (Minutes, Hours, Days)
+    /// </summary>
+    public string AutoSaveIntervalUnit
+    {
+        get => _autoSaveIntervalUnit;
+        set => SetProperty(ref _autoSaveIntervalUnit, value);
+    }
+
+    /// <summary>
+    /// Whether to enable save retention (auto-delete old saves)
+    /// </summary>
+    public bool EnableSaveRetention
+    {
+        get => _enableSaveRetention;
+        set => SetProperty(ref _enableSaveRetention, value);
+    }
+
+    /// <summary>
+    /// Save retention value
+    /// </summary>
+    public int SaveRetentionValue
+    {
+        get => _saveRetentionValue;
+        set => SetProperty(ref _saveRetentionValue, value);
+    }
+
+    /// <summary>
+    /// Save retention unit (Hours, Days, Weeks, Months)
+    /// </summary>
+    public string SaveRetentionUnit
+    {
+        get => _saveRetentionUnit;
+        set => SetProperty(ref _saveRetentionUnit, value);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

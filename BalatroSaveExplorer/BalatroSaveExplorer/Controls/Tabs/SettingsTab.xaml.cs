@@ -15,11 +15,11 @@ public partial class SettingsTab : UserControl
   public Action? UpdateBalatroDerivedPathsCallback { get; set; }
   public Action<RowDefinition, Logger>? ShowLogPanelCallback { get; set; }
   public Action<RowDefinition, Logger>? HideLogPanelCallback { get; set; }
-
   // Service references (will be injected from MainWindow)
   public SettingsUIService? SettingsUIService { get; set; }
   public Logger? Logger { get; set; }
   public RowDefinition? LogPanelRow { get; set; }
+  public SaveManagementService? SaveManagementService { get; set; }
 
   // Settings reference (will be injected from MainWindow)
   public AppSettings? WorkingSettings { get; set; }
@@ -31,7 +31,6 @@ public partial class SettingsTab : UserControl
     // Connect sub-tab event handlers after InitializeComponent
     Loaded += (s, e) => ConnectSubTabEventHandlers();
   }
-
   private void ConnectSubTabEventHandlers()
   {
     // General Settings Tab
@@ -40,7 +39,13 @@ public partial class SettingsTab : UserControl
     GeneralSettingsTabControl.BrowseLuaExportDirectoryButtonClick = BrowseLuaExportDirectoryButton_Click;
     GeneralSettingsTabControl.BrowseBackupDirectoryButtonClick = BrowseBackupDirectoryButton_Click;
 
-    // Profile Manager Tab
+    // Save management event handlers for General Settings Tab
+    GeneralSettingsTabControl.EnableAutoSaveCheckBoxCheckedChanged = EnableAutoSaveCheckBox_CheckedChanged;
+    GeneralSettingsTabControl.AutoSaveIntervalTextBoxTextChanged = AutoSaveIntervalTextBox_TextChanged;
+    GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxSelectionChanged = AutoSaveIntervalUnitComboBox_SelectionChanged;
+    GeneralSettingsTabControl.EnableSaveRetentionCheckBoxCheckedChanged = EnableSaveRetentionCheckBox_CheckedChanged;
+    GeneralSettingsTabControl.SaveRetentionValueTextBoxTextChanged = SaveRetentionValueTextBox_TextChanged;
+    GeneralSettingsTabControl.SaveRetentionUnitComboBoxSelectionChanged = SaveRetentionUnitComboBox_SelectionChanged;    // Profile Manager Tab
     ProfileManagerTabControl.BrowseBalatroSaveRootButtonClick = BrowseBalatroSaveRootButton_Click;
     ProfileManagerTabControl.BalatroSaveRootTextBoxTextChanged = BalatroSaveRootTextBox_TextChanged;
 
@@ -50,6 +55,12 @@ public partial class SettingsTab : UserControl
 
     // About Tab
     AboutTabControl.OpenSettingsFolderButtonClick = OpenSettingsFolderButton_Click;
+
+    // Initialize save management service reference for status display only
+    if (SaveManagementService != null)
+    {
+      SaveManagementTabControl.SaveManagementService = SaveManagementService;
+    }
   }
   #region Event Handlers
 
@@ -86,11 +97,122 @@ public partial class SettingsTab : UserControl
       BrowseBalatroSaveRootCallback(ProfileManagerTabControl.BalatroSaveRootTextBoxControl.Text, UpdateBalatroDerivedPathsCallback);
     }
   }
-
   private void BalatroSaveRootTextBox_TextChanged(object sender, TextChangedEventArgs e)
   {
     UpdateBalatroDerivedPathsCallback?.Invoke();
   }
+  private void DebugCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+  {
+    // Debug mode toggled - could be used to enable additional logging
+    var isChecked = sender is CheckBox checkBox && (checkBox.IsChecked ?? false);
+    Logger?.Log($"Debug mode {(isChecked ? "enabled" : "disabled")}");
+  }// Save management event handlers
+  private void EnableAutoSaveCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+  {
+    var isEnabled = GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl.IsChecked ?? false;
+    Logger?.Log($"Auto-save {(isEnabled ? "enabled" : "disabled")} - settings will be applied when Apply is clicked");
+
+    // Update the SaveManagementService immediately if available to reflect the change
+    if (SaveManagementService != null && WorkingSettings != null)
+    {
+      // Preview the change without saving to settings yet
+      var previewInterval = int.TryParse(GeneralSettingsTabControl.AutoSaveIntervalTextBoxControl.Text, out int interval) ? interval : 5;
+      var previewUnit = (GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Minutes";
+
+      if (isEnabled && previewInterval > 0)
+      {
+        Logger?.Log($"Auto-save will activate every {previewInterval} {previewUnit.ToLower()} when settings are applied");
+      }
+    }
+  }
+
+  private void AutoSaveIntervalTextBox_TextChanged(object sender, TextChangedEventArgs e)
+  {
+    var textBox = sender as TextBox;
+    if (textBox != null && int.TryParse(textBox.Text, out int interval))
+    {
+      if (interval <= 0)
+      {
+        Logger?.Log("WARNING: Auto-save interval must be greater than 0");
+      }
+      else if (interval > 0 && GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl.IsChecked == true)
+      {
+        var unit = (GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Minutes";
+        Logger?.Log($"Auto-save interval updated to {interval} {unit.ToLower()}");
+      }
+    }
+    else if (!string.IsNullOrEmpty(textBox?.Text))
+    {
+      Logger?.Log("WARNING: Auto-save interval must be a valid number");
+    }
+  }
+
+  private void AutoSaveIntervalUnitComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+  {
+    if (GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl.IsChecked == true)
+    {
+      var interval = GeneralSettingsTabControl.AutoSaveIntervalTextBoxControl.Text;
+      var unit = (sender as ComboBox)?.SelectedItem as ComboBoxItem;
+
+      if (int.TryParse(interval, out int intervalValue) && intervalValue > 0 && unit != null)
+      {
+        Logger?.Log($"Auto-save interval unit changed to {unit.Content}");
+      }
+    }
+  }
+
+  private void EnableSaveRetentionCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+  {
+    var isEnabled = GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl.IsChecked ?? false;
+    Logger?.Log($"Save retention {(isEnabled ? "enabled" : "disabled")} - settings will be applied when Apply is clicked");
+
+    if (isEnabled)
+    {
+      var retentionValue = GeneralSettingsTabControl.SaveRetentionValueTextBoxControl.Text;
+      var retentionUnit = (GeneralSettingsTabControl.SaveRetentionUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Days";
+
+      if (int.TryParse(retentionValue, out int value) && value > 0)
+      {
+        Logger?.Log($"Old saves will be deleted after {value} {retentionUnit.ToLower()} when settings are applied");
+      }
+    }
+  }
+
+  private void SaveRetentionValueTextBox_TextChanged(object sender, TextChangedEventArgs e)
+  {
+    var textBox = sender as TextBox;
+    if (textBox != null && int.TryParse(textBox.Text, out int value))
+    {
+      if (value <= 0)
+      {
+        Logger?.Log("WARNING: Save retention value must be greater than 0");
+      }
+      else if (value > 0 && GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl.IsChecked == true)
+      {
+        var unit = (GeneralSettingsTabControl.SaveRetentionUnitComboBoxControl.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Days";
+        Logger?.Log($"Save retention period updated to {value} {unit.ToLower()}");
+      }
+    }
+    else if (!string.IsNullOrEmpty(textBox?.Text))
+    {
+      Logger?.Log("WARNING: Save retention value must be a valid number");
+    }
+  }
+
+  private void SaveRetentionUnitComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+  {
+    if (GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl.IsChecked == true)
+    {
+      var value = GeneralSettingsTabControl.SaveRetentionValueTextBoxControl.Text;
+      var unit = (sender as ComboBox)?.SelectedItem as ComboBoxItem;
+
+      if (int.TryParse(value, out int retentionValue) && retentionValue > 0 && unit != null)
+      {
+        Logger?.Log($"Save retention unit changed to {unit.Content}");
+      }
+    }
+  }
+
 
   private void ApplySettingsButton_Click(object sender, RoutedEventArgs e)
   {
@@ -158,7 +280,6 @@ public partial class SettingsTab : UserControl
   #endregion
 
   #region Public Methods
-
   /// <summary>
   /// Loads the working settings into the UI controls
   /// </summary>
@@ -181,10 +302,17 @@ public partial class SettingsTab : UserControl
           GeneralSettingsTabControl.AutoRefreshOnFileChangeCheckBoxControl,
           LoggingTabControl.LogLevelComboBoxControl,
           GeneralSettingsTabControl.ThemeComboBoxControl,
-          UpdateBalatroDerivedPathsCallback);
+          UpdateBalatroDerivedPathsCallback,
+          // Save management controls
+          GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl,
+          GeneralSettingsTabControl.AutoSaveIntervalTextBoxControl,
+          GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxControl,
+          GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl,
+          GeneralSettingsTabControl.SaveRetentionValueTextBoxControl,
+          GeneralSettingsTabControl.SaveRetentionUnitComboBoxControl);      // Update save management tab with current profile info
+      SaveManagementTabControl.UpdateCurrentProfileInfo(WorkingSettings.CurrentProfileNumber, WorkingSettings.CurrentProfileSavePath);
     }
   }
-
   /// <summary>
   /// Saves the UI control values back to the working settings
   /// </summary>
@@ -206,7 +334,14 @@ public partial class SettingsTab : UserControl
           GeneralSettingsTabControl.FlashTaskbarOnUpdateCheckBoxControl,
           GeneralSettingsTabControl.AutoRefreshOnFileChangeCheckBoxControl,
           LoggingTabControl.LogLevelComboBoxControl,
-          GeneralSettingsTabControl.ThemeComboBoxControl);
+          GeneralSettingsTabControl.ThemeComboBoxControl,
+          // Save management controls
+          GeneralSettingsTabControl.EnableAutoSaveCheckBoxControl,
+          GeneralSettingsTabControl.AutoSaveIntervalTextBoxControl,
+          GeneralSettingsTabControl.AutoSaveIntervalUnitComboBoxControl,
+          GeneralSettingsTabControl.EnableSaveRetentionCheckBoxControl,
+          GeneralSettingsTabControl.SaveRetentionValueTextBoxControl,
+          GeneralSettingsTabControl.SaveRetentionUnitComboBoxControl);
     }
   }
 

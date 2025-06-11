@@ -12,6 +12,14 @@ public partial class GeneralSettingsTab : UserControl
   public Action<object, RoutedEventArgs>? BrowseLuaExportDirectoryButtonClick { get; set; }
   public Action<object, RoutedEventArgs>? BrowseBackupDirectoryButtonClick { get; set; }
 
+  // Save management event handlers
+  public Action<object, RoutedEventArgs>? EnableAutoSaveCheckBoxCheckedChanged { get; set; }
+  public Action<object, TextChangedEventArgs>? AutoSaveIntervalTextBoxTextChanged { get; set; }
+  public Action<object, SelectionChangedEventArgs>? AutoSaveIntervalUnitComboBoxSelectionChanged { get; set; }
+  public Action<object, RoutedEventArgs>? EnableSaveRetentionCheckBoxCheckedChanged { get; set; }
+  public Action<object, TextChangedEventArgs>? SaveRetentionValueTextBoxTextChanged { get; set; }
+  public Action<object, SelectionChangedEventArgs>? SaveRetentionUnitComboBoxSelectionChanged { get; set; }
+
   public GeneralSettingsTab()
   {
     InitializeComponent();
@@ -37,6 +45,37 @@ public partial class GeneralSettingsTab : UserControl
     BrowseBackupDirectoryButtonClick?.Invoke(sender, e);
   }
 
+  // Save management event handlers
+  private void EnableAutoSaveCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+  {
+    EnableAutoSaveCheckBoxCheckedChanged?.Invoke(sender, e);
+  }
+
+  private void AutoSaveIntervalTextBox_TextChanged(object sender, TextChangedEventArgs e)
+  {
+    AutoSaveIntervalTextBoxTextChanged?.Invoke(sender, e);
+  }
+
+  private void AutoSaveIntervalUnitComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+  {
+    AutoSaveIntervalUnitComboBoxSelectionChanged?.Invoke(sender, e);
+  }
+
+  private void EnableSaveRetentionCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+  {
+    EnableSaveRetentionCheckBoxCheckedChanged?.Invoke(sender, e);
+  }
+
+  private void SaveRetentionValueTextBox_TextChanged(object sender, TextChangedEventArgs e)
+  {
+    SaveRetentionValueTextBoxTextChanged?.Invoke(sender, e);
+  }
+
+  private void SaveRetentionUnitComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+  {
+    SaveRetentionUnitComboBoxSelectionChanged?.Invoke(sender, e);
+  }
+
   // Property accessors for the controls
   public ComboBox ThemeComboBoxControl => ThemeComboBox;
   public TextBox DefaultJkrDirectoryTextBoxControl => DefaultJkrDirectoryTextBox;
@@ -48,4 +87,12 @@ public partial class GeneralSettingsTab : UserControl
   public CheckBox FlashTaskbarOnUpdateCheckBoxControl => FlashTaskbarOnUpdateCheckBox;
   public CheckBox AutoRefreshOnFileChangeCheckBoxControl => AutoRefreshOnFileChangeCheckBox;
   public TextBox BackupDirectoryTextBoxControl => BackupDirectoryTextBox;
+
+  // Save management control accessors
+  public CheckBox EnableAutoSaveCheckBoxControl => EnableAutoSaveCheckBox;
+  public TextBox AutoSaveIntervalTextBoxControl => AutoSaveIntervalTextBox;
+  public ComboBox AutoSaveIntervalUnitComboBoxControl => AutoSaveIntervalUnitComboBox;
+  public CheckBox EnableSaveRetentionCheckBoxControl => EnableSaveRetentionCheckBox;
+  public TextBox SaveRetentionValueTextBoxControl => SaveRetentionValueTextBox;
+  public ComboBox SaveRetentionUnitComboBoxControl => SaveRetentionUnitComboBox;
 }
