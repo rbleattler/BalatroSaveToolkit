@@ -2,6 +2,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using BalatroSaveExplorer.Models;
 
 namespace BalatroSaveExplorer.Controls
@@ -88,6 +90,31 @@ namespace BalatroSaveExplorer.Controls
       {
         viewModel.OriginalItems = ItemsSource;
       }
+    }
+
+    private void FilteredTreeView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+      // Find the parent ScrollViewer
+      var scrollViewer = FindParentScrollViewer(FilteredTreeView);
+      if (scrollViewer != null)
+      {
+        // Scroll vertically
+        if (e.Delta != 0)
+        {
+          scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
+          e.Handled = true;
+        }
+      }
+    }
+
+    private ScrollViewer? FindParentScrollViewer(DependencyObject child)
+    {
+      DependencyObject? parent = VisualTreeHelper.GetParent(child);
+      while (parent != null && parent is not ScrollViewer)
+      {
+        parent = VisualTreeHelper.GetParent(parent);
+      }
+      return parent as ScrollViewer;
     }
   }
 }

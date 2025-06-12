@@ -109,11 +109,13 @@
         </Border>
 
         <!-- Scrollable TreeView Area -->
+
         <ScrollViewer Grid.Row="1"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled"
                       HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch">
+                      VerticalAlignment="Stretch"
+                      CanContentScroll="True">
             <Grid>
                 <!-- TreeView -->
                 <TreeView x:Name="FilteredTreeView"
@@ -121,7 +123,8 @@
                           HorizontalAlignment="Stretch"
                           MinWidth="200"
                           VirtualizingPanel.IsVirtualizing="True"
-                          VirtualizingPanel.VirtualizationMode="Recycling">
+                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          PreviewMouseWheel="FilteredTreeView_PreviewMouseWheel">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal">
