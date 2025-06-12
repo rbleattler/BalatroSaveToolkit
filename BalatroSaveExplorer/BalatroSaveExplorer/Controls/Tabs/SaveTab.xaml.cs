@@ -217,8 +217,6 @@ public partial class SaveTab : UserControl
     {
       SaveBackups.Add(backup);
     }
-
-    TotalBackupsTextBlock.Text = SaveBackups.Count.ToString();
   }
 
   /// <summary>

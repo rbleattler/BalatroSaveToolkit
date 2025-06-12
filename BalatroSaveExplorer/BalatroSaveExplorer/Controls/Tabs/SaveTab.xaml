@@ -9,7 +9,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="200"/>
+            <!-- Reserved area for save overview -->
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -47,34 +48,65 @@
         <GroupBox Grid.Row="1"
                   Header="Save Backups"
                   Margin="0,0,0,15">
-            <Grid Margin="10">
+            <Grid Margin="10"
+                  MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=GroupBox},
+                                       Converter={StaticResource PercentConverter}, ConverterParameter=1}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
+                <!-- List Controls: Buttons row -->
+                <Grid Grid.Row="0"
+                      Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- List Controls -->
-                <StackPanel Grid.Row="0"
-                            Orientation="Horizontal"
-                            Margin="0,0,0,10">
-                    <Button x:Name="RefreshListButton"
+                    <Button Grid.Column="0"
+                            x:Name="RefreshListButton"
                             Content="Refresh"
-                            MinWidth="80"
-                            MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                                       Converter={StaticResource PercentConverter}, ConverterParameter=0.15}"
-                            Height="30"
-                            Margin="0,0,10,0"
+                            Height="35"
+                            Margin="0,0,5,0"
                             Click="RefreshListButton_Click"/>
-                    <TextBlock Text="Total: "
-                               VerticalAlignment="Center"
-                               Margin="0,0,5,0"/>
-                    <TextBlock x:Name="TotalBackupsTextBlock"
-                               Text="0"
-                               VerticalAlignment="Center"
-                               FontWeight="Bold"/>
-                    <TextBlock Text=" backups"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
+
+                    <Button Grid.Column="1"
+                            x:Name="SaveButton"
+                            Content="Save"
+                            Height="35"
+                            Margin="5,0,5,0"
+                            ToolTip="Create a manual backup of the current save"
+                            Click="SaveButton_Click"/>
+
+                    <Button Grid.Column="2"
+                            x:Name="LoadButton"
+                            Content="Load"
+                            Height="35"
+                            Margin="5,0,5,0"
+                            ToolTip="Load the selected backup to the current profile"
+                            IsEnabled="False"
+                            Click="LoadButton_Click"/>
+
+                    <Button Grid.Column="3"
+                            x:Name="DeleteButton"
+                            Content="Delete"
+                            Height="35"
+                            Margin="5,0,5,0"
+                            ToolTip="Delete the selected backup"
+                            IsEnabled="False"
+                            Click="DeleteButton_Click"/>
+
+                    <Button Grid.Column="4"
+                            x:Name="OpenSavesFolderButton"
+                            Content="Open 📁"
+                            Height="35"
+                            Margin="5,0,0,0"
+                            ToolTip="Open the backup directory in Windows Explorer"
+                            Click="OpenSavesFolderButton_Click"/>
+                </Grid>
 
                 <!-- Saves List with proper styling -->
                 <ListView Grid.Row="1"
@@ -109,14 +141,14 @@
                                     Value="Transparent"/>
                             <Style.Triggers>
                                 <Trigger Property="IsSelected"
-                                        Value="True">
+                                         Value="True">
                                     <Setter Property="Background"
                                             Value="{DynamicResource AccentBrush}"/>
                                     <Setter Property="Foreground"
                                             Value="{DynamicResource InvertedTextBrush}"/>
                                 </Trigger>
                                 <Trigger Property="IsMouseOver"
-                                        Value="True">
+                                         Value="True">
                                     <Setter Property="Background"
                                             Value="{DynamicResource HoverBrush}"/>
                                 </Trigger>
@@ -127,57 +159,16 @@
             </Grid>
         </GroupBox>
 
-        <!-- Action Buttons with responsive layout -->
-        <GroupBox Grid.Row="2"
-                  Header="Actions"
-                  Margin="0,0,0,15">
-            <StackPanel Margin="10">
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,0,5">
-                    <Button x:Name="SaveButton"
-                            Content="Create Backup"
-                            MinWidth="120"
-                            MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                                       Converter={StaticResource PercentConverter}, ConverterParameter=0.25}"
-                            Height="35"
-                            Margin="0,0,10,0"
-                            ToolTip="Create a manual backup of the current save"
-                            Click="SaveButton_Click"/>
-                    <Button x:Name="LoadButton"
-                            Content="Load Backup"
-                            MinWidth="120"
-                            MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                                       Converter={StaticResource PercentConverter}, ConverterParameter=0.25}"
-                            Height="35"
-                            Margin="0,0,10,0"
-                            ToolTip="Load the selected backup to the current profile"
-                            IsEnabled="False"
-                            Click="LoadButton_Click"/>
-                    <Button x:Name="DeleteButton"
-                            Content="Delete"
-                            MinWidth="100"
-                            MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                                       Converter={StaticResource PercentConverter}, ConverterParameter=0.2}"
-                            Height="35"
-                            Margin="0,0,10,0"
-                            ToolTip="Delete the selected backup"
-                            IsEnabled="False"
-                            Click="DeleteButton_Click"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,5,0,0">
-                    <Button x:Name="OpenSavesFolderButton"
-                            Content="Open Saves Folder"
-                            MinWidth="150"
-                            MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=StackPanel},
-                                       Converter={StaticResource PercentConverter}, ConverterParameter=0.4}"
-                            Height="35"
-                            Margin="0,0,10,0"
-                            ToolTip="Open the backup directory in Windows Explorer"
-                            Click="OpenSavesFolderButton_Click"/>
-                </StackPanel>
-            </StackPanel>
-        </GroupBox>
+        <!-- Reserved Save Overview Area -->
+        <Border Grid.Row="2"
+                Margin="0,0,0,15"
+                Background="{DynamicResource SecondaryBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="5"
+                Visibility="Collapsed">
+            <!-- Reserved for save overview -->
+        </Border>
 
         <!-- Debug Options -->
         <GroupBox Grid.Row="3"
