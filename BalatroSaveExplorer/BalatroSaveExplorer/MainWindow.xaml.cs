@@ -257,5 +257,63 @@ public partial class MainWindow : Window
         }
     }
 
+    // Drag-and-drop support for .jkr files
+    private void Window_DragOver(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length == 1 && Path.GetExtension(files[0]).Equals(".jkr", StringComparison.OrdinalIgnoreCase))
+            {
+                // Only allow drop if not over a file path TextBox
+                if (!IsOverFilePathRegion(e.OriginalSource))
+                {
+                    e.Effects = DragDropEffects.Copy;
+                    e.Handled = true;
+                    return;
+                }
+            }
+        }
+        e.Effects = DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private async void Window_Drop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files.Length == 1 && Path.GetExtension(files[0]).Equals(".jkr", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!IsOverFilePathRegion(e.OriginalSource))
+                {
+                    await LoadFile(files[0]);
+                    e.Handled = true;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Determines if the drag/drop target is a file path TextBox or its child.
+    /// </summary>
+    private bool IsOverFilePathRegion(object? originalSource)
+    {
+        // Check if the original source is a TextBox used for file paths
+        DependencyObject? current = originalSource as DependencyObject;
+        while (current != null)
+        {
+            if (current is TextBox tb)
+            {
+                // Check for known file path TextBox names
+                var name = tb.Name?.ToLowerInvariant();
+                if (name != null && (name.Contains("filepath") || name.Contains("balatrosaveroot") || name.Contains("settingsfilepath")))
+                    return true;
+            }
+            current = VisualTreeHelper.GetParent(current);
+        }
+        return false;
+    }
+
     #endregion
 }
