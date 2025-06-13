@@ -31,6 +31,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Search TextBox -->
@@ -105,6 +106,17 @@
                         </Style>
                     </Button.Style>
                 </Button>
+                <!-- Export LUA button-->
+                <Button Grid.Column="3"
+                        x:Name="SaveAsLuaButton"
+                        Content="Save as Lua"
+                        MinWidth="120"
+                        MaxWidth="200"
+                        Height="30"
+                        Click="SaveAsLuaButton_Click"
+                        Margin="0,0,10,0"
+                        IsEnabled="False"/>
+
             </Grid>
         </Border>
 

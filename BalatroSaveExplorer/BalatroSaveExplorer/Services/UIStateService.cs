@@ -106,45 +106,6 @@ public class UIStateService : INotifyPropertyChanged
       _logger.Log($"Status: {message}");
     });
   }
-
-  /// <summary>
-  /// Updates the state of the Save as Lua button based on current file and existing Lua files.
-  /// </summary>
-  /// <param name="button">The Save as Lua button to update</param>
-  /// <param name="currentFilePath">The currently loaded file path</param>
-  public void UpdateSaveAsLuaButtonState(Button button, string? currentFilePath)
-  {
-    if (button == null) return;
-
-    Application.Current.Dispatcher.Invoke(() =>
-    {
-      if (string.IsNullOrEmpty(currentFilePath))
-      {
-        // No file loaded - disable button
-        button.IsEnabled = false;
-        button.Content = "Save as Lua";
-        return;
-      }
-
-      string luaPath = Path.ChangeExtension(currentFilePath, ".lua");
-      bool luaFileExists = File.Exists(luaPath);
-
-      if (luaFileExists)
-      {
-        // File exists - gray out button and change text
-        button.IsEnabled = false;
-        button.Content = "Lua file exists";
-        _logger.Log($"Lua file already exists: {luaPath}");
-      }
-      else
-      {
-        // File doesn't exist - enable button
-        button.IsEnabled = true;
-        button.Content = "Save as Lua";
-      }
-    });
-  }
-
   /// <summary>
   /// Starts a flash notification in the taskbar.
   /// </summary>
@@ -196,11 +157,7 @@ public class UIStateService : INotifyPropertyChanged
   /// <param name="title">Dialog title</param>
   public void ShowError(string message, string title = "Error")
   {
-    Application.Current.Dispatcher.Invoke(() =>
-    {
-      MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
-    });
-    _logger.Log($"ERROR shown to user: {title}: {message}");
+    StatusBarService.Instance.SetActivity(message, true);
   }
 
   /// <summary>
@@ -208,13 +165,9 @@ public class UIStateService : INotifyPropertyChanged
   /// </summary>
   /// <param name="message">Information message</param>
   /// <param name="title">Dialog title</param>
-  public void ShowInformation(string message, string title = "Information")
+  public void ShowInfo(string message)
   {
-    Application.Current.Dispatcher.Invoke(() =>
-    {
-      MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
-    });
-    _logger.Log($"Information shown to user: {title}: {message}");
+    StatusBarService.Instance.SetActivity(message);
   }
 
   /// <summary>

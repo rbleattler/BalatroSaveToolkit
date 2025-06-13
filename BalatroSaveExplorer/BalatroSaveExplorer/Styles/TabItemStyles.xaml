@@ -18,7 +18,7 @@
         <Setter Property="Padding"
                 Value="8,4"/>
         <Setter Property="Margin"
-                Value="1.5,0"/>
+                Value="0,2,0,1"/>
 
         <Setter Property="SnapsToDevicePixels"
                 Value="True"/>

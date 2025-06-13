@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using BalatroSaveExplorer.Models;
+using BalatroSaveExplorer.Services;
 
 namespace BalatroSaveExplorer.Services;
 
@@ -60,7 +61,7 @@ public class BalatroPathService
         }
         else
         {
-            MessageBox.Show("Settings file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            StatusBarService.Instance.SetActivity("Settings file not found.", true);
             return false;
         }
     }
@@ -78,7 +79,7 @@ public class BalatroPathService
         }
         else
         {
-            MessageBox.Show("Profile settings file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            StatusBarService.Instance.SetActivity("Profile settings file not found.", true);
             return false;
         }
     }
@@ -96,7 +97,7 @@ public class BalatroPathService
         }
         else
         {
-            MessageBox.Show("Profile meta file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            StatusBarService.Instance.SetActivity("Profile meta file not found.", true);
             return false;
         }
     }
@@ -114,7 +115,7 @@ public class BalatroPathService
         }
         else
         {
-            MessageBox.Show("Profile save file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            StatusBarService.Instance.SetActivity("Profile save file not found.", true);
             return false;
         }
     }

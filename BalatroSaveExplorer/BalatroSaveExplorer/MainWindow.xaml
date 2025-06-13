@@ -15,71 +15,15 @@
         DragOver="Window_DragOver"
         Drop="Window_Drop">
     <DockPanel>
-        <!-- Top toolbar -->
-        <StackPanel DockPanel.Dock="Top"
-                    Orientation="Horizontal"
-                    Margin="10"
-                    Height="40">
-            <Button x:Name="LoadFileButton"
-                    Content="Load JKR File"
-                    MinWidth="120"
-                    MaxWidth="200"
-                    Height="30"
-                    Click="LoadFileButton_Click"
-                    Margin="0,0,10,0"/>
-            <Button x:Name="SaveAsLuaButton"
-                    Content="Save as Lua"
-                    MinWidth="120"
-                    MaxWidth="200"
-                    Height="30"
-                    Click="SaveAsLuaButton_Click"
-                    Margin="0,0,10,0"
-                    IsEnabled="False"/>
-        </StackPanel>
-        <!-- Bottom status bar -->
-        <StatusBar DockPanel.Dock="Bottom"
-                   Height="25"
-                   Width="Auto">
-            <StatusBarItem Width="Auto"
-                           HorizontalAlignment="Left">
-                <Label x:Name="StatusLabel"
-                       Content="Ready"
-                       Margin="0"
-                       Padding="5,2"
-                       VerticalAlignment="Center"
-                       Foreground="{DynamicResource AccentTextBrush}"/>
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right"
-                           Width="Auto">
-                <StackPanel Orientation="Horizontal"
-                            VerticalAlignment="Center">
-                    <Ellipse x:Name="WatchingIndicator"
-                             Width="8"
-                             Height="8"
-                             Fill="Gray"
-                             Margin="0,0,5,0"
-                             HorizontalAlignment="Left"
-                             VerticalAlignment="Center"
-                             Visibility="Collapsed"/>
-                    <Label x:Name="LastUpdateLabel"
-                           Content=""
-                           FontSize="10"
-                           Margin="0"
-                           Padding="2"
-                           Foreground="{DynamicResource SecondaryTextBrush}"
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Center"
-                           Visibility="Collapsed"/>
-                </StackPanel>
-            </StatusBarItem>
-        </StatusBar>
-
         <!-- Main content area with tabs -->
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition x:Name="LogPanelRow"
                                Height="0"/>
+                <!-- StatusBarRow-->
+                <RowDefinition x:Name="StatusBarRow"
+                               Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- Main TabControl -->
@@ -160,6 +104,12 @@
                     </ScrollViewer>
                 </Grid>
             </Border>
+
+            <StackPanel Grid.Row="2"
+                        Margin="0,0,10,10">
+                <controls:StatusBarControl VerticalAlignment="Bottom"/>
+            </StackPanel>
         </Grid>
+
     </DockPanel>
 </Window>

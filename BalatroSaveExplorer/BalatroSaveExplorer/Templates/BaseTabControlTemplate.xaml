@@ -19,7 +19,7 @@
         <Setter Property="Padding"
                 Value="2"/>
         <Setter Property="Margin"
-                Value="0,0,0,2"/>
+                Value="5,10,5,5"/>
         <Setter Property="SnapsToDevicePixels"
                 Value="True"/>
 
@@ -78,8 +78,6 @@
                 Value="5"/>
         <Setter Property="BorderThickness"
                 Value="0,1,0,0"/>
-        <Setter Property="HorizontalAlignment"
-                Value="Stretch"/>
     </Style>
 
 </ResourceDictionary>

@@ -93,6 +93,9 @@
     <SolidColorBrush
         x:Key="StatusBarTextBrush"
         Color="#333333"/>
+    <SolidColorBrush
+        x:Key="StatusBarBorderBrush"
+        Color="#CCCCCC"/>
 
     <!-- Tab Control Colors -->
     <SolidColorBrush

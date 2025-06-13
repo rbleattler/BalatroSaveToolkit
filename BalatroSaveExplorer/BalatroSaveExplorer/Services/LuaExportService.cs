@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using BalatroSaveExplorer.Utilities;
+using BalatroSaveExplorer.Services;
 
 namespace BalatroSaveExplorer.Services;
 
@@ -33,14 +34,14 @@ public class LuaExportService
     if (string.IsNullOrEmpty(content))
     {
       _logger.Log("Cannot export empty content to Lua file");
-      MessageBox.Show("No content to export.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+      StatusBarService.Instance.SetActivity("No content to export.", true);
       return false;
     }
 
     if (string.IsNullOrEmpty(sourceFilePath))
     {
       _logger.Log("Source file path is required for Lua export");
-      MessageBox.Show("Source file path is required.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+      StatusBarService.Instance.SetActivity("Source file path is required.", true);
       return false;
     }
 
@@ -62,13 +63,10 @@ public class LuaExportService
       // Check if file exists and confirm overwrite if required
       if (File.Exists(outputPath) && confirmOverwrites)
       {
-        if (!CheckFileOverwrite(outputPath))
-        {
-          _logger.Log("Lua export cancelled - user declined overwrite");
-          return false;
-        }
+        // Instead of MessageBox, show a status bar prompt (non-blocking)
+        StatusBarService.Instance.SetActivity($"The file '{Path.GetFileName(outputPath)}' already exists. Overwrite not implemented in status bar version.", true);
+        return false;
       }
-
       _logger.Log($"Saving decompressed content to: {outputPath}");
 
       // Write the Lua content
@@ -76,16 +74,14 @@ public class LuaExportService
 
       _logger.Log($"Successfully saved {content.Length} characters to {outputPath}");
 
-      MessageBox.Show($"File saved successfully as:\n{outputPath}", "Success",
-          MessageBoxButton.OK, MessageBoxImage.Information);
+      StatusBarService.Instance.SetActivity($"File saved successfully as: {Path.GetFileName(outputPath)}");
 
       return true;
     }
     catch (Exception ex)
     {
-      string errorMsg = $"Error saving Lua file: {ex.Message}";
-      _logger.Log(errorMsg);
-      MessageBox.Show(errorMsg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      _logger.Log($"Lua export failed: {ex.Message}");
+      StatusBarService.Instance.SetActivity($"Lua export failed: {ex.Message}", true);
       return false;
     }
   }

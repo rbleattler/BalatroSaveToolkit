@@ -89,10 +89,13 @@
     <!-- Status Bar Colors -->
     <SolidColorBrush
         x:Key="StatusBarBackgroundBrush"
-        Color="#007ACC"/>
+        Color="Transparent"/>
     <SolidColorBrush
         x:Key="StatusBarTextBrush"
         Color="#FFFFFF"/>
+    <SolidColorBrush
+        x:Key="StatusBarBorderBrush"
+        Color="#000"/>
 
     <!-- Tab Control Colors -->
     <SolidColorBrush

@@ -4,13 +4,30 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.IO;
 using BalatroSaveExplorer.Models;
+using BalatroSaveExplorer.Services;
 
 namespace BalatroSaveExplorer.Controls
 {
   public partial class SearchableTreeView : UserControl
   {
     private ObservableCollection<TreeNodeViewModel>? _currentItemsSource;
+
+    // Dependency properties for current file info (needed for SaveAsLua functionality)
+    public static readonly DependencyProperty CurrentFilePathProperty =
+        DependencyProperty.Register(
+            nameof(CurrentFilePath),
+            typeof(string),
+            typeof(SearchableTreeView),
+            new PropertyMetadata(null, OnCurrentFileInfoChanged));
+
+    public static readonly DependencyProperty CurrentDecompressedContentProperty =
+        DependencyProperty.Register(
+            nameof(CurrentDecompressedContent),
+            typeof(string),
+            typeof(SearchableTreeView),
+            new PropertyMetadata(null, OnCurrentFileInfoChanged));
 
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(
@@ -19,10 +36,30 @@ namespace BalatroSaveExplorer.Controls
             typeof(SearchableTreeView),
             new PropertyMetadata(null, OnItemsSourceChanged));
 
+    public string? CurrentFilePath
+    {
+      get => (string?)GetValue(CurrentFilePathProperty);
+      set => SetValue(CurrentFilePathProperty, value);
+    }
+
+    public string? CurrentDecompressedContent
+    {
+      get => (string?)GetValue(CurrentDecompressedContentProperty);
+      set => SetValue(CurrentDecompressedContentProperty, value);
+    }
+
     public ObservableCollection<TreeNodeViewModel>? ItemsSource
     {
       get => (ObservableCollection<TreeNodeViewModel>?)GetValue(ItemsSourceProperty);
       set => SetValue(ItemsSourceProperty, value);
+    }
+
+    private static void OnCurrentFileInfoChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+      if (d is SearchableTreeView control)
+      {
+        control.UpdateSaveAsLuaButtonState();
+      }
     }
 
     private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -115,6 +152,38 @@ namespace BalatroSaveExplorer.Controls
         parent = VisualTreeHelper.GetParent(parent);
       }
       return parent as ScrollViewer;
+    }
+
+    private void UpdateSaveAsLuaButtonState()
+    {
+      bool hasFileLoaded = !string.IsNullOrEmpty(CurrentFilePath) && !string.IsNullOrEmpty(CurrentDecompressedContent);
+      SaveAsLuaButton.IsEnabled = hasFileLoaded;
+    }
+
+    private async void SaveAsLuaButton_Click(object sender, RoutedEventArgs e)
+    {
+      if (string.IsNullOrEmpty(CurrentFilePath) || string.IsNullOrEmpty(CurrentDecompressedContent))
+      {
+        StatusBarService.Instance.SetActivity("No file is currently loaded.", true);
+        return;
+      }
+
+      var settings = SettingsManager.Instance.Settings;
+      var luaExportService = new LuaExportService(new Logger());
+
+      // Use the LuaExportService to handle the export
+      var success = await luaExportService.SaveAsLuaAsync(
+          CurrentDecompressedContent,
+          CurrentFilePath,
+          settings.DefaultLuaExportDirectory,
+          settings.ConfirmFileOverwrites);
+
+      if (success)
+      {
+        StatusBarService.Instance.SetActivity($"Saved: {Path.GetFileName(CurrentFilePath)}.lua");
+        // Update button state since the file now exists
+        UpdateSaveAsLuaButtonState();
+      }
     }
   }
 }

@@ -17,16 +17,17 @@ using BalatroSaveExplorer.Converters;
 namespace BalatroSaveExplorer;
 
 /// <summary>
+/// <summary>
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : Window
-{    // Services
+{
+    // Services
     private readonly Logger _logger;
     private readonly JkrFileService _jkrFileService;
     private readonly BackupService _backupService;
     private readonly FileWatchingService _fileWatchingService;
     private readonly UIStateService _uiStateService;
-    private readonly LuaExportService _luaExportService;
     private readonly FileLoadingService _fileLoadingService;
     private readonly SettingsUIService _settingsUIService;
     private readonly BalatroPathService _balatroPathService;
@@ -51,7 +52,6 @@ public partial class MainWindow : Window
         _backupService = new BackupService(_logger);
         _fileWatchingService = new FileWatchingService(_logger);
         _uiStateService = new UIStateService(_logger);
-        _luaExportService = new LuaExportService(_logger);
         _fileLoadingService = new FileLoadingService(_logger, _jkrFileService, _backupService, _uiStateService, _fileWatchingService);
         _settingsUIService = new SettingsUIService(_logger);
         _balatroPathService = new BalatroPathService(_logger);
@@ -124,6 +124,7 @@ public partial class MainWindow : Window
         }
     }
 
+    // This is still used by allowing files to be dragged onto the window, despite the button being gone
     private async void LoadFileButton_Click(object sender, RoutedEventArgs e)
     {
         var filePath = FileOperations.ShowOpenJkrFileDialog();
@@ -132,6 +133,7 @@ public partial class MainWindow : Window
             await LoadFile(filePath);
         }
     }
+
     #region Settings Management
     private void UpdateBalatroDerivedPaths()
     {
@@ -157,57 +159,27 @@ public partial class MainWindow : Window
             FileInfoTabControl.GetLastModifiedTextBox(),
             FileInfoTabControl.GetCompressionInfoTextBox(),
             FileInfoTabControl.GetContentTypeTextBox(),
-            FileInfoTabControl.GetEntriesCountTextBox(),
-            (path, content) =>
+            FileInfoTabControl.GetEntriesCountTextBox(), (path, content) =>
             {
                 _currentFilePath = path;
                 _currentDecompressedContent = content;
+                // Update TreeViewTab with current file info for SaveAsLua functionality
+                TreeViewTabControl.SetCurrentFile(path, content);
             },
             () =>
             {
                 _currentFilePath = null;
                 _currentDecompressedContent = null;
+                // Clear TreeViewTab file info
+                TreeViewTabControl.SetCurrentFile(null, null);
             });
 
         // Use the FileLoadingService to load the file
         var result = await _fileLoadingService.LoadFileAsync(filePath, context);
-
-        // Update Lua button state after loading (success or failure)
-        UpdateSaveAsLuaButtonState();
     }
     private void ClearLogsButton_Click(object sender, RoutedEventArgs e)
     {
         LogPanelManager.ClearLogs(_logger, LogTextBox);
-    }
-
-    private async void SaveAsLuaButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (string.IsNullOrEmpty(_currentFilePath) || string.IsNullOrEmpty(_currentDecompressedContent))
-        {
-            MessageBox.Show("No file is currently loaded.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        var settings = SettingsManager.Instance.Settings;
-
-        // Use the LuaExportService to handle the export
-        var success = await _luaExportService.SaveAsLuaAsync(
-            _currentDecompressedContent,
-            _currentFilePath,
-            settings.DefaultLuaExportDirectory,
-            settings.ConfirmFileOverwrites);
-
-        if (success)
-        {
-            _uiStateService.SetStatusMessage($"Saved: {Path.GetFileName(_currentFilePath)}.lua");
-            // Update button state since the file now exists
-            _uiStateService.UpdateSaveAsLuaButtonState(SaveAsLuaButton, _currentFilePath);
-        }
-    }
-
-    private void UpdateSaveAsLuaButtonState()
-    {
-        _uiStateService.UpdateSaveAsLuaButtonState(SaveAsLuaButton, _currentFilePath);
     }
 
     private void OnLogAdded(object? sender, string logMessage)

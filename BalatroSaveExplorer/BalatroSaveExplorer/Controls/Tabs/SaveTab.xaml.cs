@@ -33,24 +33,24 @@ public partial class SaveTab : UserControl
     {
       if (SaveManagementService == null)
       {
-        MessageBox.Show("Save management service is not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        StatusBarService.Instance.SetActivity("Save management service is not available.", true);
         return;
       }
 
       var success = await SaveManagementService.CreateManualSaveBackupAsync();
       if (success)
       {
-        MessageBox.Show("Backup created successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        StatusBarService.Instance.SetActivity("Backup created successfully!");
         RefreshSaveBackupsList();
       }
       else
       {
-        MessageBox.Show("Failed to create backup.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        StatusBarService.Instance.SetActivity("Failed to create backup.", true);
       }
     }
     catch (Exception ex)
     {
-      MessageBox.Show($"An error occurred while creating backup: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      StatusBarService.Instance.SetActivity($"An error occurred while creating backup: {ex.Message}", true);
     }
   }
   private async void LoadButton_Click(object sender, RoutedEventArgs e)
@@ -60,13 +60,13 @@ public partial class SaveTab : UserControl
       var selectedBackup = GetSelectedBackup();
       if (selectedBackup == null)
       {
-        MessageBox.Show("Please select a backup to load.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+        StatusBarService.Instance.SetActivity("Please select a backup to load.", true);
         return;
       }
 
       if (SaveManagementService == null)
       {
-        MessageBox.Show("Save management service is not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        StatusBarService.Instance.SetActivity("Save management service is not available.", true);
         return;
       }
 
@@ -81,18 +81,18 @@ public partial class SaveTab : UserControl
         var success = await SaveManagementService.RestoreSaveBackupAsync(selectedBackup.FilePath);
         if (success)
         {
-          MessageBox.Show("Backup loaded successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+          StatusBarService.Instance.SetActivity("Backup loaded successfully!");
           UpdateCurrentProfileInfo(1, SaveManagementService.GetCurrentSaveFilePath());
         }
         else
         {
-          MessageBox.Show("Failed to load backup.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+          StatusBarService.Instance.SetActivity("Failed to load backup.", true);
         }
       }
     }
     catch (Exception ex)
     {
-      MessageBox.Show($"An error occurred while loading backup: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      StatusBarService.Instance.SetActivity($"An error occurred while loading backup: {ex.Message}", true);
     }
   }
 
@@ -103,7 +103,7 @@ public partial class SaveTab : UserControl
       var selectedBackup = GetSelectedBackup();
       if (selectedBackup == null)
       {
-        MessageBox.Show("Please select a backup to delete.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+        StatusBarService.Instance.SetActivity("Please select a backup to delete.", true);
         return;
       }
 
@@ -118,18 +118,18 @@ public partial class SaveTab : UserControl
         if (File.Exists(selectedBackup.FilePath))
         {
           File.Delete(selectedBackup.FilePath);
-          MessageBox.Show("Backup deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+          StatusBarService.Instance.SetActivity("Backup deleted successfully!");
           RefreshSaveBackupsList();
         }
         else
         {
-          MessageBox.Show("Backup file not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+          StatusBarService.Instance.SetActivity("Backup file not found.", true);
         }
       }
     }
     catch (Exception ex)
     {
-      MessageBox.Show($"An error occurred while deleting backup: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      StatusBarService.Instance.SetActivity($"An error occurred while deleting backup: {ex.Message}", true);
     }
   }
 
@@ -139,7 +139,7 @@ public partial class SaveTab : UserControl
     {
       if (SaveManagementService == null)
       {
-        MessageBox.Show("Save management service is not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        StatusBarService.Instance.SetActivity("Save management service is not available.", true);
         return;
       }
 
@@ -150,19 +150,19 @@ public partial class SaveTab : UserControl
       }
       else
       {
-        MessageBox.Show("Backup directory does not exist.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        StatusBarService.Instance.SetActivity("Backup directory does not exist.", true);
       }
     }
     catch (Exception ex)
     {
-      MessageBox.Show($"An error occurred while opening folder: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      StatusBarService.Instance.SetActivity($"An error occurred while opening folder: {ex.Message}", true);
     }
   }
 
   private void RefreshListButton_Click(object sender, RoutedEventArgs e)
   {
     RefreshSaveBackupsList();
-    MessageBox.Show("Backup list refreshed.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+    StatusBarService.Instance.SetActivity("Backup list refreshed.");
   }
 
   private void DebugCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
